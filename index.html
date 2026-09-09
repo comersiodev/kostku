@@ -981,8 +981,8 @@
     let liveExchangeRates = null;
     let currentTargetCurrency = "USD";
 
-    const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://hdzghpgwciobqharhpjm.supabase.co';
+    const SUPABASE_ANON_KEY = 'Sb_publishable_NYBzyUfQUny8b38Vj9xXiA_t-W4FItY';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     function showCustomAlert(message, title = "Informasi") {
@@ -1044,9 +1044,7 @@
         topBtn.innerHTML = `<img src="${savedPic}" alt="Profile">`;
       }
 
-      // Cek status sesi login Supabase untuk badge & sinkronisasi otomatis
       checkSupabaseLoginStatus();
-
       loadPinnedCatatanWidget();
       fetchRealtimeKurs();
     });
@@ -1058,14 +1056,12 @@
         const isLinked = localStorage.getItem("google_linked") === "true" || (session && session.user);
 
         if (isLinked) {
-          // Jika sudah terkait / login, sembunyikan badge "Login Akun"
           if (loginBadge) loginBadge.style.display = "none";
           if (session && session.user) {
             localStorage.setItem("google_linked", "true");
             localStorage.setItem("email", session.user.email);
           }
         } else {
-          // Jika belum terkait, tampilkan badge
           if (loginBadge) loginBadge.style.display = "flex";
         }
       } catch (e) {

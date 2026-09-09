@@ -288,8 +288,8 @@
 
   <script>
     let modalCallback = null;
-    const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://hdzghpgwciobqharhpjm.supabase.co';
+    const SUPABASE_ANON_KEY = 'Sb_publishable_NYBzyUfQUny8b38Vj9xXiA_t-W4FItY';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let cropImg = new Image();
@@ -420,7 +420,6 @@
       }
     }
 
-    // OTOMATIS TARIK/MUAT DATA DARI CLOUD PAS SESI LOGIN TERDETEKSI
     async function checkSupabaseSession() {
       try {
         const { data: { session } } = await _supabase.auth.getSession();
@@ -429,7 +428,6 @@
           localStorage.setItem("google_linked", "true");
           localStorage.setItem("email", googleEmail);
 
-          // Cek data di cloud, otomatis tarik jika ada
           const { data, error } = await _supabase
             .from('kostku_user_data')
             .select('*')
@@ -457,7 +455,6 @@
       loadProfileData();
     }
 
-    // OTOMATIS SIMPAN KE CLOUD SAAT PROFIL DISIMPAN
     async function saveProfileData() {
       const newName = document.getElementById("inputProfileName").value.trim() || "Nama Pengguna";
       const newDesc = document.getElementById("inputProfileDesc").value.trim();
