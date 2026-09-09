@@ -226,10 +226,7 @@
       <!-- PENGATURAN WIDGET (DELISTING & URUTAN) -->
       <div class="settings-section-card">
         <div class="settings-section-title">Kelola Widget Dashboard</div>
-        
-        <div id="widgetsSettingList">
-          <!-- Item Widget akan di-generate via JS -->
-        </div>
+        <div id="widgetsSettingList"></div>
       </div>
 
       <!-- KELOLA DATA (EXPORT & IMPORT) -->
@@ -369,7 +366,6 @@
       configs.sort((a, b) => a.order - b.order);
 
       let targetIndex = direction === 'up' ? index - 1 : index + 1;
-      
       let tempOrder = configs[index].order;
       configs[index].order = configs[targetIndex].order;
       configs[targetIndex].order = tempOrder;
@@ -378,7 +374,7 @@
       renderWidgetSettings();
     }
 
-    // FITUR EXPORT DATA (.kst) - NAMA FILE: Kostku(real-time save data)
+    // EXPORT DATA (.kst) - NAMA FILE: Kostku(real-time save data)
     function exportKostkuData() {
       const dataBackup = {};
       for (let i = 0; i < localStorage.length; i++) {
@@ -393,7 +389,7 @@
       link.click();
     }
 
-    // FITUR IMPORT DATA (.kst)
+    // IMPORT DATA (.kst)
     function importKostkuData(event) {
       const file = event.target.files[0];
       if(!file) return;
