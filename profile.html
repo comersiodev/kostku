@@ -9,35 +9,11 @@
 <!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  @font-face{
-    font-family: 'OswaldBold';
-    src: url('oswald-bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-  }
-  @font-face{
-    font-family: 'FiraCondBold';
-    src: url('firasanscondensed-bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-  }
-  @font-face{
-    font-family: 'FiraCondBook';
-    src: url('firasanscondensed-book.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-  }
+  @font-face{ font-family: 'OswaldBold'; src: url('oswald-bold.ttf') format('truetype'); font-weight: 700; font-style: normal; }
+  @font-face{ font-family: 'FiraCondBold'; src: url('firasanscondensed-bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
+  @font-face{ font-family: 'FiraCondBook'; src: url('firasanscondensed-book.otf') format('opentype'); font-weight: 400; font-style: normal; }
 
-  :root{
-    --abu: #888888;
-    --abu-terang: #cccccc;
-    --abu-tua: #1a1a1a;
-    --gelap: #000000;
-    --biru: #38bdf8;
-    --hijau: #4ade80;
-    --merah: #ff3b3b;
-  }
-
+  :root{ --abu: #888888; --abu-terang: #cccccc; --abu-tua: #1a1a1a; --gelap: #000000; --biru: #38bdf8; --hijau: #4ade80; --merah: #ff3b3b; }
   *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body{ margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'FiraCondBook', sans-serif; background: #000; }
 
@@ -48,7 +24,6 @@
   }
   .bg-dim{ position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1; }
 
-  /* TOPBAR */
   .mbanking-topbar {
     position: fixed; top: 0; left: 0; right: 0; height: 56px;
     background: rgba(0,0,0,0.95); border-bottom: 1px solid rgba(255,255,255,0.15);
@@ -57,17 +32,13 @@
   .mbanking-brand { font-family: 'OswaldBold', sans-serif; font-size: 1.1rem; color: #fff; cursor: pointer; }
   .mbanking-brand span { color: var(--abu-terang); }
 
-  /* KONTEN PROFIL */
   #screen-profile {
     position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center;
     padding-top: 68px; padding-bottom: 80px; overflow-y: auto;
   }
 
-  .profile-wrapper {
-    width: 92%; max-width: 360px; display: flex; flex-direction: column; gap: 14px;
-  }
+  .profile-wrapper { width: 92%; max-width: 360px; display: flex; flex-direction: column; gap: 14px; }
 
-  /* KARTU UTAMA PROFIL */
   .profile-card {
     background: linear-gradient(135deg, #0d0d0d, #1c1c1c);
     border: 1.5px solid var(--abu); border-radius: 16px; padding: 20px;
@@ -95,7 +66,6 @@
   .profile-email-sub { font-size: 0.8rem; color: var(--abu-terang); margin-bottom: 8px; display: none; }
   .profile-desc-text { font-size: 0.8rem; color: #aaa; font-style: italic; line-height: 1.3; max-width: 280px; }
 
-  /* KARTU FORM EDIT PROFIL */
   .form-section-card {
     background: rgba(13, 13, 13, 0.9); border: 1.5px solid rgba(255,255,255,0.15);
     border-radius: 14px; padding: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
@@ -108,52 +78,38 @@
   .form-input, .form-textarea {
     width: 100%; background: #000; border: 1px solid var(--abu); border-radius: 8px;
     color: #fff; padding: 10px 12px; font-family: 'FiraCondBook', sans-serif; font-size: 0.9rem; outline: none;
-    transition: border-color 0.2s;
   }
   .form-input:focus, .form-textarea:focus { border-color: var(--biru); }
   .form-textarea { resize: none; height: 65px; }
 
-  /* KELOLA AKUN GOOGLE */
   .google-link-box {
     display: flex; align-items: center; justify-content: space-between;
     background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 10px; padding: 10px 12px; gap: 8px;
   }
   .google-info { display: flex; align-items: center; gap: 8px; overflow: hidden; flex: 1; }
-  .google-info svg { width: 20px; height: 20px; flex-shrink: 0; }
   .google-text { font-family: 'FiraCondBold', sans-serif; font-size: 0.85rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .google-status { font-size: 0.7rem; color: var(--abu); }
   .google-status.linked { color: var(--hijau); }
 
   .btn-google-action {
     background: #222; border: 1px solid #444; color: #fff; padding: 6px 12px;
-    border-radius: 8px; font-family: 'FiraCondBold', sans-serif; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+    border-radius: 8px; font-family: 'FiraCondBold', sans-serif; font-size: 0.75rem; cursor: pointer; flex-shrink: 0;
   }
   .btn-google-action.linked { background: rgba(255, 59, 59, 0.15); border-color: var(--merah); color: var(--merah); }
   .btn-google-action:hover { border-color: var(--biru); color: var(--biru); }
 
   .save-btn {
     width: 100%; background: var(--abu-terang); border: none; color: #000; padding: 12px;
-    border-radius: 10px; font-family: 'FiraCondBold', sans-serif; font-size: 0.95rem; cursor: pointer;
-    transition: background 0.2s, transform 0.1s; text-align: center;
+    border-radius: 10px; font-family: 'FiraCondBold', sans-serif; font-size: 0.95rem; cursor: pointer; text-align: center;
   }
-  .save-btn:hover { background: #fff; transform: translateY(-1px); }
+  .save-btn:hover { background: #fff; }
 
-  /* POPUP CROPPER MODAL */
-  .cropper-modal {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; flex-direction: column;
-    justify-content: center; align-items: center; z-index: 999999; padding: 20px;
-  }
+  .cropper-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 999999; padding: 20px; }
   .cropper-modal.active { display: flex; }
-  .cropper-box {
-    width: 100%; max-width: 320px; background: #111; border: 2px solid var(--abu-terang);
-    border-radius: 16px; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 12px;
-  }
+  .cropper-box { width: 100%; max-width: 320px; background: #111; border: 2px solid var(--abu-terang); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
   .cropper-title { font-family: 'FiraCondBold', sans-serif; color: var(--abu-terang); font-size: 1rem; }
-  .canvas-container {
-    width: 240px; height: 240px; border: 2px dashed var(--biru); border-radius: 50%; overflow: hidden;
-    position: relative; background: #000; display: flex; align-items: center; justify-content: center;
-  }
+  .canvas-container { width: 240px; height: 240px; border: 2px dashed var(--biru); border-radius: 50%; overflow: hidden; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
   #cropCanvas { cursor: grab; }
   .slider-zoom { width: 80%; accent-color: var(--biru); }
   .cropper-btn-group { display: flex; gap: 8px; width: 100%; }
@@ -161,34 +117,21 @@
   .crop-btn.confirm { background: var(--hijau); color: #000; }
   .crop-btn.cancel { background: #222; color: #aaa; border: 1px solid #444; }
 
-  /* BOTTOM NAVBAR */
   .mbanking-bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
     background: rgba(0, 0, 0, 0.96); border-top: 1px solid rgba(255, 255, 255, 0.15);
     display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; z-index: 99999; backdrop-filter: blur(8px);
   }
-  .nav-item {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-decoration: none; color: #888; font-family: 'FiraCondBold', sans-serif; font-size: 0.55rem;
-    gap: 3px; padding: 4px 2px; transition: color 0.2s; cursor: pointer; background: none; border: none;
-  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #888; font-family: 'FiraCondBold', sans-serif; font-size: 0.55rem; gap: 3px; padding: 4px 2px; cursor: pointer; background: none; border: none; }
   .nav-item svg { width: 20px; height: 20px; fill: currentColor; }
   .nav-item.active, .nav-item:hover { color: var(--abu-terang); }
 
-  /* POPUP MODAL CUSTOM */
-  .popupBox {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 999999; padding: 20px;
-  }
+  .popupBox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 999999; padding: 20px; }
   .popupBox.active { display: flex; }
-  .custom-modal-box {
-    background: #0d0d0d; border: 2px solid var(--abu-terang); border-radius: 16px; padding: 20px; width: 100%; max-width: 320px; text-align: center;
-  }
+  .custom-modal-box { background: #0d0d0d; border: 2px solid var(--abu-terang); border-radius: 16px; padding: 20px; width: 100%; max-width: 320px; text-align: center; }
   .custom-modal-title { font-family: 'FiraCondBold', sans-serif; font-size: 1.1rem; color: var(--abu-terang); margin-bottom: 8px; }
   .custom-modal-msg { font-size: 0.9rem; color: #ddd; margin-bottom: 16px; line-height: 1.4; }
-  .custom-modal-buttons { display: flex; gap: 8px; }
-  .custom-modal-btn { flex: 1; padding: 10px; border-radius: 8px; font-family: 'FiraCondBold', sans-serif; font-size: 0.9rem; cursor: pointer; border: none; }
-  .custom-modal-btn.primary { background: var(--abu-terang); color: #000; }
-  .custom-modal-btn.secondary { background: #222; color: #aaa; border: 1px solid #444; }
+  .custom-modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-family: 'FiraCondBold', sans-serif; font-size: 0.9rem; cursor: pointer; border: none; background: var(--abu-terang); color: #000; }
 </style>
 </head>
 <body>
@@ -196,18 +139,14 @@
   <div class="bg-layer"></div>
   <div class="bg-dim"></div>
 
-  <!-- TOPBAR -->
   <div class="mbanking-topbar">
     <div class="mbanking-brand" onclick="window.location.href='index.html'">Kost<span>ku</span></div>
     <div style="font-family:'FiraCondBold',sans-serif; font-size:0.85rem; color:var(--abu-terang);">Profil</div>
     <div style="width: 24px;"></div>
   </div>
 
-  <!-- KONTEN UTAMA PROFIL -->
   <div id="screen-profile">
     <div class="profile-wrapper">
-
-      <!-- KARTU PREVIEW PROFIL -->
       <div class="profile-card">
         <div class="avatar-container" onclick="document.getElementById('inputAvatarFile').click()" title="Ganti Foto Profil">
           <div id="profileAvatarDisplay" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
@@ -218,12 +157,10 @@
         <input type="file" id="inputAvatarFile" accept="image/*" hidden onchange="prepareImageCrop(event)">
 
         <div class="profile-name-title" id="displayProfileName">Nama Pengguna</div>
-        <!-- Email HANYA MUNCUL JIKA SUDAH LOGIN -->
         <div class="profile-email-sub" id="displayProfileEmail"></div>
         <div class="profile-desc-text" id="displayProfileDesc">Belum ada deskripsi singkat.</div>
       </div>
 
-      <!-- KARTU FORM EDIT PROFIL -->
       <div class="form-section-card">
         <div class="form-group">
           <label class="form-label">Nama Pengguna</label>
@@ -231,17 +168,16 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Akun Google</label>
+          <label class="form-label">Akun Login</label>
           <div class="google-link-box">
             <div class="google-info">
-              <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.14v3.15C3.16 21.39 7.24 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.39-1.49-.39-2.25s.14-1.53.39-2.25V6.6H1.14C.41 8.08 0 9.77 0 12s.41 3.92 1.14 5.4l4.14-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.24 0 3.16 2.61 1.14 6.6l4.14 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/></svg>
               <div>
-                <div class="google-text" id="googleAccountLabel">Belum Dikaitkan</div>
-                <div class="google-status" id="googleAccountStatus">Login untuk sinkronisasi data</div>
+                <div class="google-text" id="googleAccountLabel">Belum Login</div>
+                <div class="google-status" id="googleAccountStatus">Offline mode</div>
               </div>
             </div>
             <div id="googleActionBtnContainer">
-              <button type="button" class="btn-google-action" onclick="triggerGoogleLogin()">Kaitkan</button>
+              <button type="button" class="btn-google-action" onclick="window.location.href='login.html'">Login</button>
             </div>
           </div>
         </div>
@@ -253,17 +189,13 @@
 
         <button type="button" class="save-btn" onclick="saveProfileData()">Simpan Perubahan</button>
       </div>
-
     </div>
   </div>
 
-  <!-- POPUP CROPPER MODAL (RASIO 1:1) -->
   <div id="cropperModal" class="cropper-modal">
     <div class="cropper-box">
       <div class="cropper-title">Sesuaikan Foto Profil (1:1)</div>
-      <div class="canvas-container">
-        <canvas id="cropCanvas" width="240" height="240"></canvas>
-      </div>
+      <div class="canvas-container"><canvas id="cropCanvas" width="240" height="240"></canvas></div>
       <input type="range" id="zoomSlider" class="slider-zoom" min="0.5" max="3" step="0.05" value="1" oninput="adjustZoom(this.value)">
       <div class="cropper-btn-group">
         <button type="button" class="crop-btn cancel" onclick="closeCropperModal()">Batal</button>
@@ -272,22 +204,17 @@
     </div>
   </div>
 
-  <!-- BOTTOM NAVBAR -->
   <nav class="mbanking-bottom-nav" id="bottomNav"></nav>
 
-  <!-- CUSTOM MODAL POPUP -->
   <div id="customModalOverlay" class="popupBox">
     <div class="custom-modal-box">
       <div class="custom-modal-title" id="customModalTitle">Informasi</div>
       <div class="custom-modal-msg" id="customModalMsg">Pesan...</div>
-      <div class="custom-modal-buttons">
-        <button type="button" class="custom-modal-btn primary" id="customModalOkBtn" onclick="closeCustomModal(true)">OK</button>
-      </div>
+      <button type="button" class="custom-modal-btn" onclick="closeCustomModal()">OK</button>
     </div>
   </div>
 
   <script>
-    let modalCallback = null;
     const SUPABASE_URL = 'https://hdzghpgwciobqharhpjm.supabase.co';
     const SUPABASE_ANON_KEY = 'Sb_publishable_NYBzyUfQUny8b38Vj9xXiA_t-W4FItY';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -299,141 +226,92 @@
     let isDragging = false, startX = 0, startY = 0;
 
     function showCustomAlert(message, title = "Informasi") {
-      return new Promise((resolve) => {
-        document.getElementById("customModalTitle").innerText = title;
-        document.getElementById("customModalMsg").innerText = message;
-        document.getElementById("customModalOverlay").classList.add("active");
-        modalCallback = (res) => resolve(res);
-      });
+      document.getElementById("customModalTitle").innerText = title;
+      document.getElementById("customModalMsg").innerText = message;
+      document.getElementById("customModalOverlay").classList.add("active");
     }
 
-    function closeCustomModal(result) {
+    function closeCustomModal() {
       document.getElementById("customModalOverlay").classList.remove("active");
-      if(modalCallback) {
-        modalCallback(result);
-        modalCallback = null;
-      }
     }
 
     const navItems = [
-      { href: "index.html",          label: "Home",       active: false,
-        svg: `<path d="M12 3l9 8h-3v9h-4v-6H10v6H6v-9H3l9-8z"/>` },
-      { href: "kelola-uang.html",    label: "Uang",       active: false,
-        svg: `<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>` },
-      { href: "utang.html",          label: "Utang",      active: false,
-        svg: `<path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>` },
-      { href: "rekap.html",          label: "Rekap",      active: false,
-        svg: `<path d="M3 3v18h18V3H3zm4 14H5v-4h2v4zm4 0h-2V9h2v8zm4 0h-2v-6h2v6zm4 0h-2V7h2v10z"/>` },
-      { href: "penagihan.html",      label: "Penagihan",  active: false,
-        svg: `<path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm6 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm5 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>` },
-      { href: "profile.html",        label: "Profil",     active: true,
-        svg: `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>` }
+      { href: "index.html", label: "Home", active: false, svg: `<path d="M12 3l9 8h-3v9h-4v-6H10v6H6v-9H3l9-8z"/>` },
+      { href: "kelola-uang.html", label: "Uang", active: false, svg: `<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>` },
+      { href: "utang.html", label: "Utang", active: false, svg: `<path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>` },
+      { href: "rekap.html", label: "Rekap", active: false, svg: `<path d="M3 3v18h18V3H3zm4 14H5v-4h2v4zm4 0h-2V9h2v8zm4 0h-2v-6h2v6zm4 0h-2V7h2v10z"/>` },
+      { href: "penagihan.html", label: "Penagihan", active: false, svg: `<path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm6 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm5 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>` },
+      { href: "profile.html", label: "Profil", active: true, svg: `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>` }
     ];
 
     function renderBottomNav() {
-      const nav = document.getElementById("bottomNav");
-      nav.innerHTML = navItems.map(item => `
+      document.getElementById("bottomNav").innerHTML = navItems.map(item => `
         <a href="${item.href}" class="nav-item ${item.active ? 'active' : ''}">
           <svg viewBox="0 0 24 24">${item.svg}</svg>
           <span>${item.label}</span>
         </a>
       `).join("");
     }
-
     renderBottomNav();
 
     function loadProfileData() {
-      let savedName = localStorage.getItem("username");
-      if (!savedName || savedName === "Pengguna Google") {
-        savedName = "";
-        localStorage.setItem("username", "");
-      }
-
-      const name = savedName;
+      let savedName = localStorage.getItem("username") || "";
       const email = localStorage.getItem("email");
       const desc = localStorage.getItem("profile_desc") || "";
       const pic = localStorage.getItem("profile_picture") || localStorage.getItem("user_avatar");
-      const googleLinked = localStorage.getItem("google_linked") === "true";
+      const isLinked = localStorage.getItem("google_linked") === "true";
 
-      document.getElementById("inputProfileName").value = name;
-      document.getElementById("displayProfileName").innerText = name ? name : "Nama Pengguna";
+      document.getElementById("inputProfileName").value = savedName;
+      document.getElementById("displayProfileName").innerText = savedName ? savedName : "Nama Pengguna";
 
       const emailElem = document.getElementById("displayProfileEmail");
-      if (googleLinked && email) {
+      if (isLinked && email) {
         emailElem.innerText = email;
         emailElem.style.display = "block";
       } else {
-        emailElem.innerText = "";
         emailElem.style.display = "none";
       }
 
-      const descElem = document.getElementById("inputProfileDesc");
-      descElem.value = desc;
+      document.getElementById("inputProfileDesc").value = desc;
       document.getElementById("displayProfileDesc").innerText = desc ? desc : "Belum ada deskripsi singkat.";
 
       if(pic) {
         document.getElementById("profileAvatarDisplay").innerHTML = `<img src="${pic}" alt="Avatar">`;
       }
 
-      updateGoogleUI(googleLinked, email);
-    }
-
-    function updateGoogleUI(isLinked, email) {
       const label = document.getElementById("googleAccountLabel");
       const status = document.getElementById("googleAccountStatus");
       const actionContainer = document.getElementById("googleActionBtnContainer");
 
       if(isLinked) {
-        label.innerText = email;
-        status.innerText = "Akun Terhubung (Auto-Sync Aktif)";
+        label.innerText = email || "Terhubung";
+        status.innerText = "Cloud Sync Aktif";
         status.className = "google-status linked";
-        actionContainer.innerHTML = `<button type="button" class="btn-google-action linked" onclick="unlinkGoogleAccount()">Putuskan</button>`;
+        actionContainer.innerHTML = `<button type="button" class="btn-google-action linked" onclick="logoutAccount()">Logout</button>`;
       } else {
-        label.innerText = "Belum Dikaitkan";
-        status.innerText = "Login untuk sinkronisasi data";
+        label.innerText = "Belum Login";
+        status.innerText = "Offline mode";
         status.className = "google-status";
-        actionContainer.innerHTML = `<button type="button" class="btn-google-action" onclick="triggerGoogleLogin()">Kaitkan</button>`;
+        actionContainer.innerHTML = `<button type="button" class="btn-google-action" onclick="window.location.href='login.html'">Login</button>`;
       }
     }
 
-    async function triggerGoogleLogin() {
-      try {
-        const { data, error } = await _supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: window.location.href }
-        });
-        if (error) throw error;
-      } catch (err) {
-        showCustomAlert("Gagal mengaitkan Google: " + err.message, "Kesalahan");
-      }
-    }
-
-    async function unlinkGoogleAccount() {
-      try {
-        await _supabase.auth.signOut();
-        localStorage.removeItem("google_linked");
-        localStorage.removeItem("email");
-        loadProfileData();
-        showCustomAlert("Akun Google berhasil diputuskan.", "Berhasil");
-      } catch (err) {
-        showCustomAlert("Gagal memutus akun: " + err.message, "Kesalahan");
-      }
+    async function logoutAccount() {
+      await _supabase.auth.signOut();
+      localStorage.removeItem("google_linked");
+      localStorage.removeItem("email");
+      loadProfileData();
+      showCustomAlert("Berhasil keluar akun.", "Informasi");
     }
 
     async function checkSupabaseSession() {
       try {
         const { data: { session } } = await _supabase.auth.getSession();
         if (session && session.user) {
-          let googleEmail = session.user.email;
           localStorage.setItem("google_linked", "true");
-          localStorage.setItem("email", googleEmail);
+          localStorage.setItem("email", session.user.email);
 
-          const { data, error } = await _supabase
-            .from('kostku_user_data')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-
+          const { data } = await _supabase.from('kostku_user_data').select('*').eq('user_id', session.user.id).single();
           if (data) {
             if (data.base_saldo !== undefined) localStorage.setItem("kostku_base_saldo", data.base_saldo);
             if (data.total_income !== undefined) localStorage.setItem("kostku_total_income", data.total_income);
@@ -449,9 +327,7 @@
             }
           }
         }
-      } catch (e) {
-        console.error("Session check error:", e);
-      }
+      } catch (e) {}
       loadProfileData();
     }
 
@@ -482,12 +358,9 @@
             profile_picture: localStorage.getItem("profile_picture") || "",
             updated_at: new Date()
           };
-
           await _supabase.from('kostku_user_data').upsert(payloadData, { onConflict: 'user_id' });
         }
-      } catch (e) {
-        console.error("Auto-sync error:", e);
-      }
+      } catch (e) {}
 
       showCustomAlert("Profil berhasil disimpan!", "Berhasil");
     }
@@ -495,12 +368,10 @@
     function prepareImageCrop(event) {
       const file = event.target.files[0];
       if(!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
         cropImg.onload = function() {
-          imgScale = 1;
-          document.getElementById('zoomSlider').value = 1;
+          imgScale = 1; document.getElementById('zoomSlider').value = 1;
           imgX = (cropCanvas.width - cropImg.width) / 2;
           imgY = (cropCanvas.height - cropImg.height) / 2;
           drawCropCanvas();
@@ -522,41 +393,13 @@
       ctx.restore();
     }
 
-    function adjustZoom(val) {
-      imgScale = parseFloat(val);
-      drawCropCanvas();
-    }
+    function adjustZoom(val) { imgScale = parseFloat(val); drawCropCanvas(); }
 
-    cropCanvas.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX - imgX;
-      startY = e.clientY - imgY;
-    });
-    window.addEventListener('mousemove', (e) => {
-      if(!isDragging) return;
-      imgX = e.clientX - startX;
-      imgY = e.clientY - startY;
-      drawCropCanvas();
-    });
+    cropCanvas.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX - imgX; startY = e.clientY - imgY; });
+    window.addEventListener('mousemove', (e) => { if(!isDragging) return; imgX = e.clientX - startX; imgY = e.clientY - startY; drawCropCanvas(); });
     window.addEventListener('mouseup', () => { isDragging = false; });
 
-    cropCanvas.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      startX = e.touches[0].clientX - imgX;
-      startY = e.touches[0].clientY - imgY;
-    });
-    window.addEventListener('touchmove', (e) => {
-      if(!isDragging) return;
-      imgX = e.touches[0].clientX - startX;
-      imgY = e.touches[0].clientY - startY;
-      drawCropCanvas();
-    });
-    window.addEventListener('touchend', () => { isDragging = false; });
-
-    function closeCropperModal() {
-      document.getElementById('cropperModal').classList.remove('active');
-    }
-
+    function closeCropperModal() { document.getElementById('cropperModal').classList.remove('active'); }
     function confirmCrop() {
       const croppedDataUrl = cropCanvas.toDataURL('image/jpeg', 0.9);
       localStorage.setItem("profile_picture", croppedDataUrl);
@@ -565,10 +408,7 @@
       closeCropperModal();
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      checkSupabaseSession();
-    });
+    window.addEventListener("DOMContentLoaded", () => { checkSupabaseSession(); });
   </script>
-
 </body>
 </html>

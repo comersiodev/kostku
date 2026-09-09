@@ -606,35 +606,6 @@
     font-size: 1.1rem;
   }
 
-  .option-btn {
-    width: 100%;
-    background: #111;
-    border: 1.5px solid var(--abu-terang);
-    color: white;
-    padding: 12px;
-    border-radius: 12px;
-    font-family: 'FiraCondBold', sans-serif;
-    font-size: 0.95rem;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: background 0.2s;
-    text-align: center;
-  }
-
-  .option-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-  }
-
-  .option-btn.logout {
-    border-color: #ff3b3b;
-    color: #ff3b3b;
-  }
-
-  .option-btn.logout:hover {
-    background: rgba(255, 59, 59, 0.2);
-  }
-
   .cancelButton {
     width: 100%;
     background: #2a2a2a;
@@ -645,73 +616,6 @@
     font-family: 'FiraCondBold', sans-serif;
     cursor: pointer;
     margin-top: 5px;
-  }
-
-  /* MODAL CUSTOM ALERT & PROMPT */
-  .custom-modal-box {
-    background: #0d0d0d;
-    border: 2px solid var(--abu-terang);
-    border-radius: 16px;
-    padding: 20px;
-    width: 100%;
-    max-width: 320px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-  }
-
-  .custom-modal-title {
-    font-family: 'FiraCondBold', sans-serif;
-    font-size: 1.1rem;
-    color: var(--abu-terang);
-    margin-bottom: 8px;
-  }
-
-  .custom-modal-msg {
-    font-size: 0.9rem;
-    color: #ddd;
-    margin-bottom: 16px;
-    line-height: 1.4;
-    white-space: pre-wrap;
-  }
-
-  .custom-modal-input {
-    width: 100%;
-    height: 42px;
-    background: #000;
-    border: 1px solid var(--abu);
-    border-radius: 8px;
-    color: #fff;
-    padding: 0 12px;
-    font-family: 'FiraCondBook', sans-serif;
-    font-size: 0.95rem;
-    margin-bottom: 16px;
-    outline: none;
-  }
-
-  .custom-modal-buttons {
-    display: flex;
-    gap: 8px;
-  }
-
-  .custom-modal-btn {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    font-family: 'FiraCondBold', sans-serif;
-    font-size: 0.9rem;
-    cursor: pointer;
-    border: none;
-  }
-
-  .custom-modal-btn.primary {
-    background: var(--abu-terang);
-    color: #000;
-  }
-
-  .custom-modal-btn.secondary {
-    background: #222;
-    color: #aaa;
-    border: 1px solid #444;
   }
 
   /* BOTTOM NAVBAR */
@@ -780,8 +684,8 @@
     
     <!-- TOMBOL PROFIL, BADGE LOGIN, & DROPDOWN -->
     <div class="topbar-right-wrap">
-      <!-- Badge Pemberitahuan Login (Hilang otomatis jika sudah terikat) -->
-      <a href="profile.html" class="login-badge-pill" id="loginBadgePill">
+      <!-- Badge Pemberitahuan Login -->
+      <a href="login.html" class="login-badge-pill" id="loginBadgePill">
         ⚠️ Login Akun
       </a>
 
@@ -795,7 +699,7 @@
         <button type="button" class="dropdown-item" onclick="window.location.href='profile.html'">
           👤 Kunjungi Profil
         </button>
-        <button type="button" class="dropdown-item" onclick="openDataOptionsPopup()">
+        <button type="button" class="dropdown-item" onclick="window.location.href='pengaturan.html'">
           ⚙️ Pengaturan
         </button>
       </div>
@@ -945,95 +849,16 @@
     </div>
   </div>
 
-  <!-- CUSTOM MODAL POPUP CONTAINER -->
-  <div id="customModalOverlay" class="popupBox">
-    <div class="custom-modal-box">
-      <div class="custom-modal-title" id="customModalTitle">Informasi</div>
-      <div class="custom-modal-msg" id="customModalMsg">Pesan konfirmasi...</div>
-      <div id="customModalInputWrapper" style="display:none;">
-        <input type="text" id="customModalInputField" class="custom-modal-input" placeholder="Ketik disini...">
-      </div>
-      <div class="custom-modal-buttons" id="customModalBtnContainer">
-        <button type="button" class="custom-modal-btn primary" id="customModalOkBtn" onclick="closeCustomModal(true)">OK</button>
-        <button type="button" class="custom-modal-btn secondary" id="customModalCancelBtn" onclick="closeCustomModal(false)" style="display:none;">Batal</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- POPUP PENGATURAN UTAMA -->
-  <div id="dataOptionsPopup" class="popupBox">
-    <div class="popupContent">
-        <h2>PENGATURAN</h2>
-        <button type="button" class="option-btn" onclick="editSaldoBase(); closeDataOptionsPopup();">💰 Atur Saldo Kostku</button>
-        <button type="button" class="option-btn" onclick="saveKostkuData(); closeDataOptionsPopup();">💾 Save Data</button>
-        <button type="button" class="option-btn" onclick="document.getElementById('loadFile').click(); closeDataOptionsPopup();">📂 Load Data</button>
-        <button type="button" class="option-btn logout" onclick="logoutKostku()">🚪 Logout</button>
-        <button type="button" class="cancelButton" onclick="closeDataOptionsPopup()">Batal</button>
-    </div>
-  </div>
-  <input type="file" id="loadFile" accept=".kst" hidden>
-
   <!-- BOTTOM NAVBAR -->
   <nav class="mbanking-bottom-nav" id="bottomNav"></nav>
 
   <script>
-    let modalCallback = null;
     let liveExchangeRates = null;
     let currentTargetCurrency = "USD";
 
     const SUPABASE_URL = 'https://hdzghpgwciobqharhpjm.supabase.co';
     const SUPABASE_ANON_KEY = 'Sb_publishable_NYBzyUfQUny8b38Vj9xXiA_t-W4FItY';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    function showCustomAlert(message, title = "Informasi") {
-      return new Promise((resolve) => {
-        document.getElementById("customModalTitle").innerText = title;
-        document.getElementById("customModalMsg").innerText = message;
-        document.getElementById("customModalInputWrapper").style.display = "none";
-        document.getElementById("customModalCancelBtn").style.display = "none";
-        document.getElementById("customModalOverlay").classList.add("active");
-        modalCallback = (res) => resolve(res);
-      });
-    }
-
-    function showCustomConfirm(message, title = "Konfirmasi") {
-      return new Promise((resolve) => {
-        document.getElementById("customModalTitle").innerText = title;
-        document.getElementById("customModalMsg").innerText = message;
-        document.getElementById("customModalInputWrapper").style.display = "none";
-        document.getElementById("customModalCancelBtn").style.display = "block";
-        document.getElementById("customModalOverlay").classList.add("active");
-        modalCallback = (res) => resolve(res);
-      });
-    }
-
-    function showCustomPrompt(message, defaultValue = "", title = "Masukan") {
-      return new Promise((resolve) => {
-        document.getElementById("customModalTitle").innerText = title;
-        document.getElementById("customModalMsg").innerText = message;
-        const inputField = document.getElementById("customModalInputField");
-        inputField.value = defaultValue;
-        document.getElementById("customModalInputWrapper").style.display = "block";
-        document.getElementById("customModalCancelBtn").style.display = "block";
-        document.getElementById("customModalOverlay").classList.add("active");
-        setTimeout(() => inputField.focus(), 100);
-        modalCallback = (res) => {
-          if(res) {
-            resolve(inputField.value);
-          } else {
-            resolve(null);
-          }
-        };
-      });
-    }
-
-    function closeCustomModal(result) {
-      document.getElementById("customModalOverlay").classList.remove("active");
-      if(modalCallback) {
-        modalCallback(result);
-        modalCallback = null;
-      }
-    }
 
     const username = localStorage.getItem("username") || "Sobat";
 
@@ -1124,21 +949,6 @@
       document.getElementById("display-expense").innerText = formatIDR(totalExpense);
       document.getElementById("display-debt").innerText = formatIDR(totalDebt);
       document.getElementById("display-lend").innerText = formatIDR(totalLend);
-    }
-
-    async function editSaldoBase() {
-      let currentBase = localStorage.getItem("kostku_base_saldo") || 0;
-      let input = await showCustomPrompt("Masukkan nominal Saldo Kostku (Modal / Saldo Awal):", currentBase, "Atur Saldo Kostku");
-      if (input !== null) {
-        let parsed = parseFloat(input);
-        if (!isNaN(parsed)) {
-          localStorage.setItem("kostku_base_saldo", parsed);
-          loadDashboardFinance();
-          await showCustomAlert("Saldo Kostku berhasil diperbarui!", "Berhasil");
-        } else {
-          await showCustomAlert("Format angka tidak valid!", "Kesalahan");
-        }
-      }
     }
 
     loadDashboardFinance();
@@ -1257,85 +1067,6 @@
         });
       }
     });
-
-    function openDataOptionsPopup() {
-      document.getElementById("dataOptionsPopup").classList.add("active");
-    }
-
-    function closeDataOptionsPopup() {
-      document.getElementById("dataOptionsPopup").classList.remove("active");
-    }
-
-    function saveKostkuData(){
-        const data = {
-            base_saldo: localStorage.getItem("kostku_base_saldo") || 0,
-            total_income: localStorage.getItem("kostku_total_income") || 0,
-            total_expense: localStorage.getItem("kostku_total_expense") || 0,
-            total_debt: localStorage.getItem("kostku_total_debt") || 0,
-            total_lend: localStorage.getItem("kostku_total_lend") || 0,
-            profile: {
-                username: localStorage.getItem("username") || "Sobat",
-                email: localStorage.getItem("email") || "",
-                title: localStorage.getItem("title") || "",
-                profile_picture: localStorage.getItem("profile_picture") || localStorage.getItem("user_avatar") || ""
-            }
-        };
-
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "Kostku.kst";
-        link.click();
-    }
-
-    document.getElementById("loadFile").addEventListener("change", function(e){
-        const file = e.target.files[0];
-        if(!file) return;
-
-        const reader = new FileReader();
-        reader.onload = async function(event){
-            try{
-                const data = JSON.parse(event.target.result);
-                if(data.base_saldo !== undefined) localStorage.setItem("kostku_base_saldo", data.base_saldo);
-                if(data.total_income !== undefined) localStorage.setItem("kostku_total_income", data.total_income);
-                if(data.total_expense !== undefined) localStorage.setItem("kostku_total_expense", data.total_expense);
-                if(data.total_debt !== undefined) localStorage.setItem("kostku_total_debt", data.total_debt);
-                if(data.total_lend !== undefined) localStorage.setItem("kostku_total_lend", data.total_lend);
-
-                if(data.profile) {
-                  if(data.profile.username) localStorage.setItem("username", data.profile.username);
-                  if(data.profile.email !== undefined) localStorage.setItem("email", data.profile.email);
-                  if(data.profile.title !== undefined) localStorage.setItem("title", data.profile.title);
-                  if(data.profile.profile_picture) {
-                    localStorage.setItem("profile_picture", data.profile.profile_picture);
-                    localStorage.setItem("user_avatar", data.profile.profile_picture);
-                  }
-                }
-
-                await showCustomAlert("Data berhasil di load!", "Berhasil");
-                location.reload();
-            }catch{
-                await showCustomAlert("File bukan Kostku.kst", "Kesalahan");
-            }
-        };
-        reader.readAsText(file);
-    });
-
-    async function logoutKostku(){
-        let conf = await showCustomConfirm("Apakah kamu yakin ingin keluar?", "Konfirmasi Logout");
-        if(conf) {
-          try {
-            await _supabase.auth.signOut();
-          } catch(e) {}
-          localStorage.removeItem("username");
-          localStorage.removeItem("email");
-          localStorage.removeItem("title");
-          localStorage.removeItem("profile_picture");
-          localStorage.removeItem("user_avatar");
-          localStorage.removeItem("google_linked");
-          window.location.href = "login.html";
-        }
-    }
   </script>
 
 </body>
