@@ -70,7 +70,7 @@
   .popupBox.active { display: flex; }
   .custom-modal-box { background: #0d0d0d; border: 2px solid var(--abu-terang); border-radius: 16px; padding: 20px; width: 100%; max-width: 320px; text-align: center; }
   .custom-modal-title { font-family: 'FiraCondBold', sans-serif; font-size: 1.1rem; color: var(--abu-terang); margin-bottom: 8px; }
-  .custom-modal-msg { font-size: 0.9rem; color: #ddd; margin-bottom: 16px; line-height: 1.4; }
+  .custom-modal-msg { font-size: 0.9rem; color: #ddd; margin-bottom: 16px; line-height: 1.4; word-break: break-all; }
   .custom-modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-family: 'FiraCondBold', sans-serif; font-size: 0.9rem; cursor: pointer; border: none; background: var(--abu-terang); color: #000; }
 </style>
 </head>
@@ -113,7 +113,7 @@
 
   <script>
     const SUPABASE_URL = 'https://hdzghpgwciobqharhpjm.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_NYBzyUfQUny8b38Vj9xXiA_t-W4FItY';
+    const SUPABASE_ANON_KEY = 'Sb_publishable_NYBzyUfQUny8b38Vj9xXiA_t-W4FItY';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let isRegisterMode = false;
@@ -158,7 +158,7 @@
           window.location.href = "index.html";
         }
       } catch (err) {
-        showCustomAlert("Gagal: " + err.message, "Kesalahan");
+        showCustomAlert(err.message || JSON.stringify(err), "Gagal Supabase");
       }
     }
 

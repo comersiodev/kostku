@@ -33,6 +33,7 @@
     --gelap: #000000;
     --biru: #38bdf8;
     --merah: #ff3b3b;
+    --hijau: #4ade80;
   }
 
   *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -93,6 +94,46 @@
   .settings-section-title {
     font-family: 'FiraCondBold', sans-serif; font-size: 0.8rem; color: var(--abu-terang);
     text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;
+  }
+
+  /* TOMBOL EKSPORT & IMPORT DENGAN SVG */
+  .data-action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .data-action-btn {
+    background: #111;
+    border: 1.5px solid var(--abu);
+    color: #fff;
+    padding: 10px 8px;
+    border-radius: 10px;
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .data-action-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+  .data-action-btn.export:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--biru);
+    color: var(--biru);
+  }
+  .data-action-btn.import:hover {
+    background: rgba(74, 222, 128, 0.15);
+    border-color: var(--hijau);
+    color: var(--hijau);
   }
 
   /* ITEM WIDGET TOGGLE & URUTAN */
@@ -187,8 +228,24 @@
         <div class="settings-section-title">Kelola Widget Dashboard</div>
         
         <div id="widgetsSettingList">
-          <!-- Item Widget akan di-generate via JS supaya bisa diatur urutannya -->
+          <!-- Item Widget akan di-generate via JS -->
         </div>
+      </div>
+
+      <!-- KELOLA DATA (EXPORT & IMPORT) -->
+      <div class="settings-section-card">
+        <div class="settings-section-title">Backup & Pemulihan Data</div>
+        <div class="data-action-grid">
+          <button type="button" class="data-action-btn export" onclick="exportKostkuData()">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <span>Export (.kst)</span>
+          </button>
+          <button type="button" class="data-action-btn import" onclick="document.getElementById('importFileField').click()">
+            <svg viewBox="0 0 24 24"><path d="M19 15v4H5v-4H3v4c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-4h-2zM13 3v8h3l-4 4-4-4h3V3h2z"/></svg>
+            <span>Import (.kst)</span>
+          </button>
+        </div>
+        <input type="file" id="importFileField" accept=".kst" hidden onchange="importKostkuData(event)">
       </div>
 
       <!-- TOMBOL LOGOUT -->
@@ -204,7 +261,7 @@
     <div class="custom-modal-box">
       <div class="custom-modal-title" id="customModalTitle">Konfirmasi</div>
       <div class="custom-modal-msg" id="customModalMsg">Pesan...</div>
-      <div class="custom-modal-buttons">
+      <div class="custom-modal-buttons" id="customModalBtnGroup">
         <button type="button" class="custom-modal-btn primary" id="customModalOkBtn" onclick="closeCustomModal(true)">Ya</button>
         <button type="button" class="custom-modal-btn secondary" id="customModalCancelBtn" onclick="closeCustomModal(false)">Batal</button>
       </div>
@@ -218,6 +275,17 @@
       return new Promise((resolve) => {
         document.getElementById("customModalTitle").innerText = title;
         document.getElementById("customModalMsg").innerText = message;
+        document.getElementById("customModalCancelBtn").style.display = "block";
+        document.getElementById("customModalOverlay").classList.add("active");
+        modalCallback = (res) => resolve(res);
+      });
+    }
+
+    function showCustomAlert(message, title = "Informasi") {
+      return new Promise((resolve) => {
+        document.getElementById("customModalTitle").innerText = title;
+        document.getElementById("customModalMsg").innerText = message;
+        document.getElementById("customModalCancelBtn").style.display = "none";
         document.getElementById("customModalOverlay").classList.add("active");
         modalCallback = (res) => resolve(res);
       });
@@ -231,7 +299,6 @@
       }
     }
 
-    // Data Awal Widget (Default urutan & status aktif)
     let defaultWidgets = [
       { id: 'kurs', name: 'Kurs Rupiah (Real-Time)', active: true, order: 1 },
       { id: 'converter', name: 'Konverter Mata Uang', active: true, order: 2 },
@@ -265,7 +332,6 @@
 
     function renderWidgetSettings() {
       let configs = getStoredWidgetsConfig();
-      // Urutkan berdasarkan property order
       configs.sort((a, b) => a.order - b.order);
 
       const container = document.getElementById("widgetsSettingList");
@@ -304,13 +370,52 @@
 
       let targetIndex = direction === 'up' ? index - 1 : index + 1;
       
-      // Tukar posisi order
       let tempOrder = configs[index].order;
       configs[index].order = configs[targetIndex].order;
       configs[targetIndex].order = tempOrder;
 
       saveWidgetsConfig(configs);
       renderWidgetSettings();
+    }
+
+    // FITUR EXPORT DATA (.kst) - NAMA FILE: Kostku(real-time save data)
+    function exportKostkuData() {
+      const dataBackup = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        dataBackup[key] = localStorage.getItem(key);
+      }
+
+      const blob = new Blob([JSON.stringify(dataBackup, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `Kostku(real-time save data)_${new Date().toISOString().slice(0,10)}.kst`;
+      link.click();
+    }
+
+    // FITUR IMPORT DATA (.kst)
+    function importKostkuData(event) {
+      const file = event.target.files[0];
+      if(!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const parsedData = JSON.parse(e.target.result);
+          let confirmRestore = await showCustomConfirm("Import data ini akan menimpa data yang ada di perangkat sekarang. Lanjutkan?", "Konfirmasi Pemulihan");
+          if(confirmRestore) {
+            for (const key in parsedData) {
+              localStorage.setItem(key, parsedData[key]);
+            }
+            await showCustomAlert("Data berhasil dipulihkan! Halaman akan dimuat ulang.", "Berhasil");
+            window.location.reload();
+          }
+        } catch(err) {
+          await showCustomAlert("File backup tidak valid atau rusak!", "Kesalahan");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
     }
 
     async function confirmLogout() {
