@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Login - Kostku</title>
+<link rel="stylesheet" href="style.css">
+<meta name="theme-color" content="#000000">
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  @font-face{
+    font-family: 'OswaldBold';
+    src: url('oswald-bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
+  @font-face{
+    font-family: 'FiraCondBold';
+    src: url('firasanscondensed-bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+  @font-face{
+    font-family: 'FiraCondBook';
+    src: url('firasanscondensed-book.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  :root{
+    --abu: #888888;
+    --abu-terang: #cccccc;
+    --abu-tua: #1a1a1a;
+    --gelap: #000000;
+    --biru: #38bdf8;
+    --hijau: #4ade80;
+    --merah: #ff3b3b;
+  }
+
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body{ margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'FiraCondBook', sans-serif; background: #000; }
+
+  .bg-layer{
+    position: fixed; inset: 0;
+    background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjuCYRrpK_F7zIPk0QFsm4YqWoP3VZXyYORohocnvBauwuJc69m9Zqf9l4l080KOOrkP1C5Lc2AD94oE8o6fnbUf_lNziQKSW9VjrcOko3Y4lA6Q43XXqeoEJn6Do1h0JWVC7MQREoHPcxZ8K1WRm1ouayuhxKpKTTtB7W6jVPYQL2lFX6_O9izv360q7PA/s1376/1788971700934.jpg');
+    background-size: cover; background-position: center; z-index: 0;
+  }
+  .bg-dim{ position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1; }
+
+  /* CONTAINER LOGIN */
+  .login-container {
+    position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+
+  .login-card {
+    width: 100%; max-width: 340px; background: linear-gradient(135deg, #0d0d0d, #1c1c1c);
+    border: 2px solid var(--abu); border-radius: 20px; padding: 24px; text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 16px;
+  }
+
+  .login-brand { font-family: 'OswaldBold', sans-serif; font-size: 1.8rem; color: #fff; margin-bottom: -4px; }
+  .login-brand span { color: var(--abu-terang); }
+  .login-subtitle { font-size: 0.85rem; color: var(--abu-terang); margin-bottom: 8px; }
+
+  .btn-google-login {
+    width: 100%; background: #fff; color: #000; border: none; padding: 12px;
+    border-radius: 12px; font-family: 'FiraCondBold', sans-serif; font-size: 0.95rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform 0.1s, background 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .btn-google-login:hover { background: #f0f0f0; transform: translateY(-1px); }
+  .btn-google-login svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+  .btn-skip {
+    background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #aaa; padding: 10px;
+    border-radius: 10px; font-family: 'FiraCondBold', sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-skip:hover { border-color: var(--abu-terang); color: #fff; }
+
+  /* CUSTOM MODAL POPUP */
+  .popupBox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 999999; padding: 20px;
+  }
+  .popupBox.active { display: flex; }
+  .custom-modal-box {
+    background: #0d0d0d; border: 2px solid var(--abu-terang); border-radius: 16px; padding: 20px; width: 100%; max-width: 320px; text-align: center;
+  }
+  .custom-modal-title { font-family: 'FiraCondBold', sans-serif; font-size: 1.1rem; color: var(--abu-terang); margin-bottom: 8px; }
+  .custom-modal-msg { font-size: 0.9rem; color: #ddd; margin-bottom: 16px; line-height: 1.4; }
+  .custom-modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-family: 'FiraCondBold', sans-serif; font-size: 0.9rem; cursor: pointer; border: none; background: var(--abu-terang); color: #000; }
+</style>
+</head>
+<body>
+
+  <div class="bg-layer"></div>
+  <div class="bg-dim"></div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div>
+        <div class="login-brand">Kost<span>ku</span></div>
+        <div class="login-subtitle">Kelola keuangan kos jadi lebih mudah & aman</div>
+      </div>
+
+      <div style="font-size: 0.8rem; color: #888; line-height: 1.4;">
+        Masuk menggunakan Akun Google untuk menyinkronkan seluruh data aplikasi Anda ke cloud secara otomatis.
+      </div>
+
+      <button type="button" class="btn-google-login" onclick="loginWithGoogle()">
+        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.14v3.15C3.16 21.39 7.24 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.39-1.49-.39-2.25s.14-1.53.39-2.25V6.6H1.14C.41 8.08 0 9.77 0 12s.41 3.92 1.14 5.4l4.14-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.24 0 3.16 2.61 1.14 6.6l4.14 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/></svg>
+        Masuk dengan Google
+      </button>
+
+      <button type="button" class="btn-skip" onclick="window.location.href='index.html'">Lewati / Lanjutkan Offline</button>
+    </div>
+  </div>
+
+  <!-- CUSTOM MODAL POPUP -->
+  <div id="customModalOverlay" class="popupBox">
+    <div class="custom-modal-box">
+      <div class="custom-modal-title" id="customModalTitle">Informasi</div>
+      <div class="custom-modal-msg" id="customModalMsg">Pesan...</div>
+      <button type="button" class="custom-modal-btn" onclick="closeCustomModal()">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function showCustomAlert(message, title = "Informasi") {
+      document.getElementById("customModalTitle").innerText = title;
+      document.getElementById("customModalMsg").innerText = message;
+      document.getElementById("customModalOverlay").classList.add("active");
+    }
+
+    function closeCustomModal() {
+      document.getElementById("customModalOverlay").classList.remove("active");
+    }
+
+    async function loginWithGoogle() {
+      try {
+        const { data, error } = await _supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.origin + '/index.html' }
+        });
+        if (error) throw error;
+      } catch (err) {
+        showCustomAlert("Gagal login dengan Google: " + err.message, "Kesalahan");
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (session && session.user) {
+          localStorage.setItem("google_linked", "true");
+          localStorage.setItem("email", session.user.email);
+          window.location.href = "index.html";
+        }
+      } catch(e) {}
+    });
+  </script>
+
+</body>
+</html>

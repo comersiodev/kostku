@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pengaturan - Kostku</title>
+<link rel="stylesheet" href="style.css">
+<meta name="theme-color" content="#000000">
+<style>
+  @font-face{
+    font-family: 'OswaldBold';
+    src: url('oswald-bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
+  @font-face{
+    font-family: 'FiraCondBold';
+    src: url('firasanscondensed-bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+  @font-face{
+    font-family: 'FiraCondBook';
+    src: url('firasanscondensed-book.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  :root{
+    --abu: #888888;
+    --abu-terang: #cccccc;
+    --abu-tua: #1a1a1a;
+    --gelap: #000000;
+    --biru: #38bdf8;
+    --merah: #ff3b3b;
+  }
+
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body{ margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'FiraCondBook', sans-serif; background: #000; }
+
+  .bg-layer{
+    position: fixed; inset: 0;
+    background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjuCYRrpK_F7zIPk0QFsm4YqWoP3VZXyYORohocnvBauwuJc69m9Zqf9l4l080KOOrkP1C5Lc2AD94oE8o6fnbUf_lNziQKSW9VjrcOko3Y4lA6Q43XXqeoEJn6Do1h0JWVC7MQREoHPcxZ8K1WRm1ouayuhxKpKTTtB7W6jVPYQL2lFX6_O9izv360q7PA/s1376/1788971700934.jpg');
+    background-size: cover; background-position: center; z-index: 0;
+  }
+  .bg-dim{ position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1; }
+
+  /* TOPBAR */
+  .mbanking-topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 56px;
+    background: rgba(0,0,0,0.95); border-bottom: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 20; backdrop-filter: blur(8px);
+  }
+  .mbanking-brand { font-family: 'OswaldBold', sans-serif; font-size: 1.1rem; color: #fff; }
+  .mbanking-brand span { color: var(--abu-terang); }
+
+  /* KONTEN PENGATURAN */
+  #screen-settings {
+    position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center;
+    padding-top: 68px; padding-bottom: 30px; overflow-y: auto;
+  }
+
+  .settings-wrapper {
+    width: 92%; max-width: 360px; display: flex; flex-direction: column; gap: 14px;
+  }
+
+  /* PREVIEW PROFILE CARD */
+  .profile-preview-card {
+    background: linear-gradient(135deg, #111, #1c1c1c);
+    border: 1.5px solid var(--abu); border-radius: 14px; padding: 14px;
+    display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .profile-preview-card:hover { border-color: var(--biru); transform: translateY(-2px); }
+  
+  .preview-avatar {
+    width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--abu-terang);
+    background: var(--abu-tua); overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .preview-avatar img, .preview-avatar svg { width: 100%; height: 100%; object-fit: cover; }
+  .preview-avatar svg { fill: var(--abu-terang); padding: 8px; }
+
+  .preview-info { display: flex; flex-direction: column; overflow: hidden; }
+  .preview-name { font-family: 'FiraCondBold', sans-serif; font-size: 1rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .preview-email { font-size: 0.75rem; color: var(--abu-terang); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .preview-hint { font-size: 0.65rem; color: var(--biru); margin-top: 2px; font-family: 'FiraCondBold', sans-serif; }
+
+  /* SECTIONS / KARTU OPSI */
+  .settings-section-card {
+    background: rgba(13, 13, 13, 0.9); border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 14px; padding: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .settings-section-title {
+    font-family: 'FiraCondBold', sans-serif; font-size: 0.8rem; color: var(--abu-terang);
+    text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;
+  }
+
+  /* ITEM WIDGET TOGGLE & URUTAN */
+  .widget-setting-item {
+    display: flex; flex-direction: column; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .widget-setting-item:last-child { border-bottom: none; }
+  
+  .widget-setting-row {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .widget-name { font-family: 'FiraCondBold', sans-serif; font-size: 0.85rem; color: #fff; }
+
+  /* TOGGLE SWITCH */
+  .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; cursor: pointer; inset: 0; background-color: #333;
+    transition: .3s; border-radius: 22px; border: 1px solid #555;
+  }
+  .slider:before {
+    position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px;
+    background-color: white; transition: .3s; border-radius: 50%;
+  }
+  input:checked + .slider { background-color: var(--biru); border-color: var(--biru); }
+  input:checked + .slider:before { transform: translateX(18px); }
+
+  /* TOMBOL URUTAN (NAIK / TURUN) */
+  .order-control {
+    display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--abu);
+  }
+  .order-btn {
+    background: #222; border: 1px solid #444; color: #fff; padding: 3px 8px; border-radius: 6px;
+    cursor: pointer; font-family: 'FiraCondBold', sans-serif; font-size: 0.75rem;
+  }
+  .order-btn:hover { background: #333; border-color: var(--biru); color: var(--biru); }
+
+  /* TOMBOL LOGOUT */
+  .logout-btn-box {
+    width: 100%; background: rgba(255, 59, 59, 0.15); border: 1.5px solid var(--merah);
+    color: var(--merah); padding: 12px; border-radius: 12px; font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.95rem; cursor: pointer; text-align: center; transition: background 0.2s;
+  }
+  .logout-btn-box:hover { background: rgba(255, 59, 59, 0.3); color: #fff; }
+
+  /* POPUP MODAL CUSTOM */
+  .popupBox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 999999; padding: 20px;
+  }
+  .popupBox.active { display: flex; }
+  .custom-modal-box {
+    background: #0d0d0d; border: 2px solid var(--abu-terang); border-radius: 16px; padding: 20px; width: 100%; max-width: 320px; text-align: center;
+  }
+  .custom-modal-title { font-family: 'FiraCondBold', sans-serif; font-size: 1.1rem; color: var(--abu-terang); margin-bottom: 8px; }
+  .custom-modal-msg { font-size: 0.9rem; color: #ddd; margin-bottom: 16px; line-height: 1.4; }
+  .custom-modal-buttons { display: flex; gap: 8px; }
+  .custom-modal-btn { flex: 1; padding: 10px; border-radius: 8px; font-family: 'FiraCondBold', sans-serif; font-size: 0.9rem; cursor: pointer; border: none; }
+  .custom-modal-btn.primary { background: var(--abu-terang); color: #000; }
+  .custom-modal-btn.secondary { background: #222; color: #aaa; border: 1px solid #444; }
+</style>
+</head>
+<body>
+
+  <div class="bg-layer"></div>
+  <div class="bg-dim"></div>
+
+  <!-- TOPBAR -->
+  <div class="mbanking-topbar">
+    <div class="mbanking-brand" style="cursor:pointer;" onclick="window.location.href='index.html'">Kost<span>ku</span></div>
+    <div style="font-family:'FiraCondBold',sans-serif; font-size:0.85rem; color:var(--abu-terang);">Pengaturan</div>
+    <div style="width: 24px;"></div>
+  </div>
+
+  <!-- KONTEN UTAMA -->
+  <div id="screen-settings">
+    <div class="settings-wrapper">
+
+      <!-- PREVIEW PROFILE -->
+      <a href="profile.html" class="profile-preview-card">
+        <div class="preview-avatar" id="settingAvatarPreview">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+        </div>
+        <div class="preview-info">
+          <span class="preview-name" id="settingNamePreview">Sobat Kostku</span>
+          <span class="preview-email" id="settingEmailPreview">email@domain.com</span>
+          <span class="preview-hint">Edit Profil ➔</span>
+        </div>
+      </a>
+
+      <!-- PENGATURAN WIDGET (DELISTING & URUTAN) -->
+      <div class="settings-section-card">
+        <div class="settings-section-title">Kelola Widget Dashboard</div>
+        
+        <div id="widgetsSettingList">
+          <!-- Item Widget akan di-generate via JS supaya bisa diatur urutannya -->
+        </div>
+      </div>
+
+      <!-- TOMBOL LOGOUT -->
+      <button type="button" class="logout-btn-box" onclick="confirmLogout()">
+        🚪 Logout Akun
+      </button>
+
+    </div>
+  </div>
+
+  <!-- CUSTOM MODAL POPUP -->
+  <div id="customModalOverlay" class="popupBox">
+    <div class="custom-modal-box">
+      <div class="custom-modal-title" id="customModalTitle">Konfirmasi</div>
+      <div class="custom-modal-msg" id="customModalMsg">Pesan...</div>
+      <div class="custom-modal-buttons">
+        <button type="button" class="custom-modal-btn primary" id="customModalOkBtn" onclick="closeCustomModal(true)">Ya</button>
+        <button type="button" class="custom-modal-btn secondary" id="customModalCancelBtn" onclick="closeCustomModal(false)">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let modalCallback = null;
+
+    function showCustomConfirm(message, title = "Konfirmasi") {
+      return new Promise((resolve) => {
+        document.getElementById("customModalTitle").innerText = title;
+        document.getElementById("customModalMsg").innerText = message;
+        document.getElementById("customModalOverlay").classList.add("active");
+        modalCallback = (res) => resolve(res);
+      });
+    }
+
+    function closeCustomModal(result) {
+      document.getElementById("customModalOverlay").classList.remove("active");
+      if(modalCallback) {
+        modalCallback(result);
+        modalCallback = null;
+      }
+    }
+
+    // Data Awal Widget (Default urutan & status aktif)
+    let defaultWidgets = [
+      { id: 'kurs', name: 'Kurs Rupiah (Real-Time)', active: true, order: 1 },
+      { id: 'converter', name: 'Konverter Mata Uang', active: true, order: 2 },
+      { id: 'catatan', name: 'Catatan Penting Disematkan', active: true, order: 3 }
+    ];
+
+    function loadSettingsProfile() {
+      const name = localStorage.getItem("username") || "Sobat Kostku";
+      const email = localStorage.getItem("email") || "Belum ada email";
+      const pic = localStorage.getItem("profile_picture") || localStorage.getItem("user_avatar");
+
+      document.getElementById("settingNamePreview").innerText = name;
+      document.getElementById("settingEmailPreview").innerText = email;
+
+      if(pic) {
+        document.getElementById("settingAvatarPreview").innerHTML = `<img src="${pic}" alt="Avatar">`;
+      }
+    }
+
+    function getStoredWidgetsConfig() {
+      let saved = localStorage.getItem("kostku_widgets_config");
+      if(saved) {
+        try { return JSON.parse(saved); } catch(e) {}
+      }
+      return defaultWidgets;
+    }
+
+    function saveWidgetsConfig(configs) {
+      localStorage.setItem("kostku_widgets_config", JSON.stringify(configs));
+    }
+
+    function renderWidgetSettings() {
+      let configs = getStoredWidgetsConfig();
+      // Urutkan berdasarkan property order
+      configs.sort((a, b) => a.order - b.order);
+
+      const container = document.getElementById("widgetsSettingList");
+      container.innerHTML = configs.map((w, index) => `
+        <div class="widget-setting-item">
+          <div class="widget-setting-row">
+            <span class="widget-name">${w.name}</span>
+            <label class="switch">
+              <input type="checkbox" ${w.active ? 'checked' : ''} onchange="toggleWidgetActive('${w.id}', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="widget-setting-row" style="font-size: 0.7rem; color: var(--abu);">
+            <span>Urutan ke-${index + 1}</span>
+            <div class="order-control">
+              ${index > 0 ? `<button type="button" class="order-btn" onclick="moveWidgetOrder(${index}, 'up')">▲ Naik</button>` : ''}
+              ${index < configs.length - 1 ? `<button type="button" class="order-btn" onclick="moveWidgetOrder(${index}, 'down')">Turun ▼</button>` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleWidgetActive(id, status) {
+      let configs = getStoredWidgetsConfig();
+      let target = configs.find(w => w.id === id);
+      if(target) {
+        target.active = status;
+        saveWidgetsConfig(configs);
+      }
+    }
+
+    function moveWidgetOrder(index, direction) {
+      let configs = getStoredWidgetsConfig();
+      configs.sort((a, b) => a.order - b.order);
+
+      let targetIndex = direction === 'up' ? index - 1 : index + 1;
+      
+      // Tukar posisi order
+      let tempOrder = configs[index].order;
+      configs[index].order = configs[targetIndex].order;
+      configs[targetIndex].order = tempOrder;
+
+      saveWidgetsConfig(configs);
+      renderWidgetSettings();
+    }
+
+    async function confirmLogout() {
+      let conf = await showCustomConfirm("Apakah kamu yakin ingin keluar dari akun?", "Konfirmasi Logout");
+      if(conf) {
+        localStorage.removeItem("username");
+        localStorage.removeItem("email");
+        localStorage.removeItem("title");
+        localStorage.removeItem("profile_picture");
+        localStorage.removeItem("user_avatar");
+        window.location.href = "login.html";
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      loadSettingsProfile();
+      renderWidgetSettings();
+    });
+  </script>
+
+</body>
+</html>

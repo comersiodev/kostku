@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kelola Uang - Kostku</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log("Kostku siap offline!"))
+      .catch(err => console.log("Gagal daftar sw:", err));
+  }
+</script>
+
+<style>
+  @font-face{
+    font-family: 'OswaldBold';
+    src: url('oswald-bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  @font-face{
+    font-family: 'FiraCondBold';
+    src: url('firasanscondensed-bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  @font-face{
+    font-family: 'FiraCondBook';
+    src: url('firasanscondensed-book.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  :root{
+    --abu: #888888;
+    --abu-terang: #cccccc;
+    --abu-tua: #1a1a1a;
+    --gelap: #000000;
+    --hijau: #4ade80;
+    --kuning: #ffd166;
+    --merah: #ff6b6b;
+  }
+
+  *{
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'FiraCondBook', sans-serif;
+  }
+
+  body{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: #000000;
+  }
+
+  .bg-layer{
+    position: fixed;
+    inset: 0;
+    background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjuCYRrpK_F7zIPk0QFsm4YqWoP3VZXyYORohocnvBauwuJc69m9Zqf9l4l080KOOrkP1C5Lc2AD94oE8o6fnbUf_lNziQKSW9VjrcOko3Y4lA6Q43XXqeoEJn6Do1h0JWVC7MQREoHPcxZ8K1WRm1ouayuhxKpKTTtB7W6jVPYQL2lFX6_O9izv360q7PA/s1376/1788971700934.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: 0;
+  }
+
+  .bg-dim{
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1;
+  }
+
+  /* TOP BAR */
+  .mbanking-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 20;
+    backdrop-filter: blur(8px);
+  }
+
+  .mbanking-brand-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .mbanking-brand {
+    font-family: 'OswaldBold', sans-serif;
+    font-size: 1.1rem;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
+  .mbanking-brand span {
+    color: var(--abu-terang);
+  }
+
+  .mbanking-greeting-top {
+    font-size: 0.7rem;
+    color: var(--abu-terang);
+    font-family: 'FiraCondBold', sans-serif;
+    margin-top: 1px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  /* TOPBAR RIGHT CONTAINER UNTUK DROPDOWN */
+  .topbar-right-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  /* BULETAN PROFILE SVG / FOTO DI POJOK KANAN ATAS */
+  .profile-circle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--abu);
+    background: var(--abu-tua);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  .profile-circle-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+  }
+
+  .profile-circle-btn svg, .profile-circle-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-circle-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--abu-terang);
+    padding: 2px;
+  }
+
+  /* DROPDOWN NAVIGASI KECIL DI POJOK KANAN ATAS (SMOOTH TRANSITION) */
+  .profile-dropdown-menu {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    width: 170px;
+    background: rgba(13, 13, 13, 0.96);
+    border: 1.5px solid var(--abu-terang);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+    z-index: 999;
+    backdrop-filter: blur(10px);
+    
+    /* Animasi Smooth */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(0.96);
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                visibility 0.25s;
+  }
+
+  .profile-dropdown-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    color: var(--abu-terang);
+    text-decoration: none;
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    background: none;
+    border: none;
+    text-align: left;
+    width: 100%;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+
+  /* MAIN SCREEN */
+  #screen-kelolauang{
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 64px;
+    padding-bottom: 80px;
+    overflow-y: auto;
+  }
+
+  .section-wrap {
+    width: 92%;
+    max-width: 360px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.85rem;
+    color: var(--abu-terang);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* ============ CASH FLOW HEALTH CARD ============ */
+  .health-card {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0d0d0d, #1c1c1c);
+    border: 2px solid var(--abu);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  }
+
+  .health-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .health-title {
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.8rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .health-badge {
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .health-badge.sehat {
+    background: rgba(74, 222, 128, 0.15);
+    color: var(--hijau);
+    border: 1px solid var(--hijau);
+  }
+
+  .health-badge.waspada {
+    background: rgba(255, 209, 102, 0.15);
+    color: var(--kuning);
+    border: 1px solid var(--kuning);
+  }
+
+  .health-badge.bahaya {
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--merah);
+    border: 1px solid var(--merah);
+  }
+
+  .ffp-bar-track {
+    position: relative;
+    width: 100%;
+    height: 22px;
+    background: #111;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #333;
+    margin-bottom: 6px;
+  }
+
+  .ffp-bar-fill {
+    height: 100%;
+    border-radius: 8px 0 0 8px;
+    transition: width 0.5s ease, background 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 6px;
+  }
+
+  .ffp-bar-fill span {
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.65rem;
+    color: #000;
+  }
+
+  .ffp-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #fff;
+    opacity: 0.8;
+  }
+
+  .health-stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .health-stat-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 8px 10px;
+  }
+
+  .health-stat-label {
+    font-size: 0.6rem;
+    color: #888;
+    text-transform: uppercase;
+  }
+
+  .health-stat-val {
+    font-family: 'OswaldBold', sans-serif;
+    font-size: 1rem;
+    color: var(--abu-terang);
+    margin-top: 2px;
+  }
+
+  .health-warning-box {
+    display: none;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid var(--merah);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 4px;
+  }
+
+  .health-warning-box.active {
+    display: flex;
+  }
+
+  .health-warning-box svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--merah);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .health-warning-text {
+    font-size: 0.72rem;
+    color: #ffb3b3;
+    line-height: 1.35;
+  }
+
+  .health-warning-text b {
+    color: var(--merah);
+  }
+
+  /* ============ FILTER BULAN ============ */
+  .month-filter-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .month-filter-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .month-chip {
+    flex-shrink: 0;
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.75rem;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--abu);
+    background: rgba(0,0,0,0.6);
+    color: var(--abu-terang);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .month-chip.active {
+    background: var(--abu-terang);
+    color: #000;
+    border-color: var(--abu-terang);
+  }
+
+  /* ============ HISTORY TRANSAKSI ============ */
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .history-empty {
+    text-align: center;
+    color: #666;
+    font-size: 0.8rem;
+    padding: 24px 10px;
+    border: 1.5px dashed #333;
+    border-radius: 12px;
+  }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,0,0,0.85);
+    border: 1.5px solid #333;
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+
+  .history-item:active {
+    transform: scale(0.98);
+  }
+
+  .history-item:hover {
+    border-color: var(--abu-terang);
+  }
+
+  .history-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .history-icon.income-bg { background: rgba(74, 222, 128, 0.15); border: 1px solid var(--hijau); }
+  .history-icon.expense-bg { background: rgba(255, 107, 107, 0.15); border: 1px solid var(--merah); }
+
+  .history-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .history-icon.income-bg svg { fill: var(--hijau); }
+  .history-icon.expense-bg svg { fill: var(--merah); }
+
+  .history-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .history-cat {
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.85rem;
+    color: #f0f0f0;
+  }
+
+  .history-note {
+    font-size: 0.68rem;
+    color: #888;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .history-date {
+    font-size: 0.65rem;
+    color: #666;
+    margin-top: 1px;
+  }
+
+  .history-amount {
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .history-amount.income { color: var(--hijau); }
+  .history-amount.expense { color: var(--merah); }
+
+  /* ============ FLOATING ADD BUTTON ============ */
+  .fab-add-btn {
+    position: fixed;
+    bottom: 78px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--abu-terang);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    z-index: 40;
+    transition: transform 0.2s;
+  }
+
+  .fab-add-btn:active {
+    transform: scale(0.9);
+  }
+
+  .fab-add-btn svg {
+    width: 26px;
+    height: 26px;
+    fill: #000;
+  }
+
+  /* ============ POPUP / MODAL ============ */
+  .popupBox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    padding: 20px;
+  }
+
+  .popupBox.active {
+    display: flex;
+  }
+
+  .popupContent {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 340px;
+    background: #000;
+    border: 2px solid var(--abu-terang);
+    border-radius: 20px;
+    padding: 20px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .popupContent h2 {
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-family: 'FiraCondBold', sans-serif;
+    color: var(--abu-terang);
+    text-align: center;
+    font-size: 1.1rem;
+  }
+
+  .tipe-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .tipe-btn {
+    padding: 10px 6px;
+    border-radius: 12px;
+    border: 1.5px solid var(--abu);
+    background: #111;
+    color: #aaa;
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+
+  .tipe-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  .tipe-btn.selected.income {
+    background: rgba(74, 222, 128, 0.15);
+    border-color: var(--hijau);
+    color: var(--hijau);
+  }
+
+  .tipe-btn.selected.expense {
+    background: rgba(255, 107, 107, 0.15);
+    border-color: var(--merah);
+    color: var(--merah);
+  }
+
+  .form-label {
+    font-size: 0.72rem;
+    color: #999;
+    font-family: 'FiraCondBold', sans-serif;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-input {
+    width: 100%;
+    height: 44px;
+    background: #0d0d0d;
+    border: 1px solid var(--abu);
+    border-radius: 10px;
+    color: #fff;
+    padding: 0 12px;
+    font-family: 'FiraCondBook', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  .form-input:focus {
+    border-color: var(--abu-terang);
+  }
+
+  textarea.form-input {
+    height: 64px;
+    padding: 10px 12px;
+    resize: none;
+    font-family: 'FiraCondBook', sans-serif;
+  }
+
+  .kategori-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .kategori-chip {
+    padding: 8px 4px;
+    border-radius: 10px;
+    border: 1.5px solid #333;
+    background: #0d0d0d;
+    color: #aaa;
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.7rem;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+  }
+
+  .kategori-chip svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  .kategori-chip.selected {
+    border-color: var(--abu-terang);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+  }
+
+  .modal-btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .modal-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+  }
+
+  .modal-btn.simpan {
+    background: var(--abu-terang);
+    color: #000;
+  }
+
+  .modal-btn.hapus {
+    background: rgba(255, 59, 59, 0.15);
+    border: 1.5px solid #ff3b3b;
+    color: #ff3b3b;
+  }
+
+  .modal-btn.batal {
+    background: #1a1a1a;
+    border: 1.5px solid #444;
+    color: #aaa;
+  }
+
+  .custom-modal-box {
+    background: #0d0d0d;
+    border: 2px solid var(--abu-terang);
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  }
+
+  .custom-modal-title {
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 1.1rem;
+    color: var(--abu-terang);
+    margin-bottom: 8px;
+  }
+
+  .custom-modal-msg {
+    font-size: 0.9rem;
+    color: #ddd;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+  }
+
+  .custom-modal-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .custom-modal-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+  }
+
+  .custom-modal-btn.primary {
+    background: var(--abu-terang);
+    color: #000;
+  }
+
+  .custom-modal-btn.secondary {
+    background: #222;
+    color: #aaa;
+    border: 1px solid #444;
+  }
+
+  /* BOTTOM NAVBAR */
+  .mbanking-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(0, 0, 0, 0.96);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    z-index: 99999;
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #888;
+    font-family: 'FiraCondBold', sans-serif;
+    font-size: 0.55rem;
+    gap: 3px;
+    padding: 4px 2px;
+    transition: color 0.2s;
+    cursor: pointer;
+    background: none;
+    border: none;
+    min-width: 0;
+  }
+
+  .nav-item span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .nav-item svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  .nav-item.active, .nav-item:hover {
+    color: var(--abu-terang);
+  }
+</style>
+</head>
+<body>
+
+  <div class="bg-layer"></div>
+  <div class="bg-dim"></div>
+
+  <!-- TOP BAR -->
+  <div class="mbanking-topbar">
+    <div class="mbanking-brand-container">
+      <div class="mbanking-brand">Kost<span>ku</span></div>
+      <div class="mbanking-greeting-top">Kelola Uang</div>
+    </div>
+    
+    <!-- WRAPPER KANAN UNTUK FOTO PROFIL & DROPDOWN MENU -->
+    <div class="topbar-right-wrap">
+      <div class="profile-circle-btn" id="topProfileBtn" onclick="toggleProfileDropdown(event)" title="Menu Profil">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+        </svg>
+      </div>
+
+      <!-- DROPDOWN KECIL DI POJOK KANAN ATAS (SMOOTH TRANSITION) -->
+      <div class="profile-dropdown-menu" id="profileDropdownMenu">
+        <button type="button" class="dropdown-item" onclick="window.location.href='profile.html'">
+          👤 Kunjungi Profil
+        </button>
+        <button type="button" class="dropdown-item" onclick="openPengaturanPage()">
+          ⚙️ Pengaturan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SCREEN -->
+  <div id="screen-kelolauang">
+
+    <!-- CASH FLOW HEALTH DASHBOARD -->
+    <div class="section-wrap">
+      <div class="health-card">
+        <div class="health-header">
+          <div class="health-title">Kesehatan Cash Flow</div>
+          <div class="health-badge sehat" id="healthBadge">SEHAT</div>
+        </div>
+
+        <!-- Bar Progress -->
+        <div class="ffp-bar-track" style="margin-bottom: 6px;">
+          <div class="ffp-bar-fill" id="ffpBarFill" style="width:0%; background:#4ade80;">
+            <span id="ffpBarPercent">0%</span>
+          </div>
+          <div class="ffp-marker" style="left: 53.3%;"></div>
+        </div>
+
+        <!-- Skala Angka & Keterangan Batas Wajar -->
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; font-size: 0.6rem; color: #888; margin-bottom: 12px; font-family: 'FiraCondBold', sans-serif;">
+          <div style="text-align: left;">0%</div>
+          <div style="text-align: center; color: var(--kuning); display: flex; align-items: center; justify-content: center; gap: 3px; background: rgba(255, 209, 102, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 209, 102, 0.2);">
+            <svg style="width: 10px; height: 10px; fill: var(--kuning); flex-shrink: 0;" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            Batas Wajar 80%
+          </div>
+          <div style="text-align: right;">150%+</div>
+        </div>
+
+        <div class="health-stats-row">
+          <div class="health-stat-box">
+            <div class="health-stat-label">Rasio Pengeluaran</div>
+            <div class="health-stat-val" id="statRasio">0%</div>
+          </div>
+          <div class="health-stat-box">
+            <div class="health-stat-label">Sisa Bersih</div>
+            <div class="health-stat-val" id="statSisa">Rp 0</div>
+          </div>
+        </div>
+
+        <div class="health-warning-box" id="healthWarningBox">
+          <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          <div class="health-warning-text" id="healthWarningText">
+            Pengeluaran bulan ini <b>melebihi batas wajar</b> dari total pendapatan!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER BULAN -->
+    <div class="section-wrap">
+      <div class="section-title">Pilih Bulan</div>
+      <div class="month-filter-scroll" id="monthFilterScroll"></div>
+    </div>
+
+    <!-- HISTORY TRANSAKSI -->
+    <div class="section-wrap">
+      <div class="section-title">
+        <span>History Transaksi</span>
+        <span id="historyMonthLabel" style="color:#666; font-size:0.7rem; text-transform:none;"></span>
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+  </div>
+
+  <!-- FLOATING ADD BUTTON -->
+  <button class="fab-add-btn" id="fabAddBtn" onclick="openAddPopup()">
+    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+  </button>
+
+  <!-- BOTTOM NAVBAR -->
+  <nav class="mbanking-bottom-nav" id="bottomNav"></nav>
+
+  <!-- POPUP TAMBAH / EDIT TRANSAKSI -->
+  <div id="transaksiPopup" class="popupBox">
+    <div class="popupContent">
+      <h2 id="transaksiPopupTitle">Tambah Transaksi</h2>
+
+      <div class="tipe-toggle">
+        <div class="tipe-btn income" id="btnTipeIncome" onclick="pilihTipe('income')">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.21 1.87 1.39 0 2.11-.74 2.11-1.72 0-1.04-.75-1.54-2.62-1.99-2.02-.49-3.78-1.34-3.78-3.41 0-1.67 1.31-2.91 3.03-3.26V4h2.67v1.94c1.46.32 2.67 1.3 2.89 3.03h-1.96c-.22-.88-.89-1.44-2.01-1.44-1.2 0-1.9.68-1.9 1.57 0 .95.73 1.41 2.47 1.86 2.18.57 3.93 1.46 3.93 3.56 0 1.76-1.32 2.99-3.13 3.37z"/></svg>
+          Pendapatan
+        </div>
+        <div class="tipe-btn expense" id="btnTipeExpense" onclick="pilihTipe('expense')">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+          Pengeluaran
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Kategori</label>
+        <div class="kategori-grid" id="kategoriGrid"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nominal (Rp)</label>
+        <input type="number" inputmode="numeric" class="form-input" id="inputNominal" placeholder="Contoh: 50000">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tanggal</label>
+        <input type="date" class="form-input" id="inputTanggal">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Catatan (opsional)</label>
+        <textarea class="form-input" id="inputCatatan" placeholder="Tulis catatan tambahan..."></textarea>
+      </div>
+
+      <div class="modal-btn-row" id="modalBtnRow">
+        <button type="button" class="modal-btn batal" onclick="closeTransaksiPopup()">Batal</button>
+        <button type="button" class="modal-btn simpan" onclick="simpanTransaksi()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM MODAL POPUP CONTAINER -->
+  <div id="customModalOverlay" class="popupBox">
+    <div class="custom-modal-box">
+      <div class="custom-modal-title" id="customModalTitle">Informasi</div>
+      <div class="custom-modal-msg" id="customModalMsg">Pesan konfirmasi...</div>
+      <div class="custom-modal-buttons" id="customModalBtnContainer">
+        <button type="button" class="custom-modal-btn primary" id="customModalOkBtn" onclick="closeCustomModal(true)">OK</button>
+        <button type="button" class="custom-modal-btn secondary" id="customModalCancelBtn" onclick="closeCustomModal(false)" style="display:none;">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let modalCallback = null;
+
+    function showCustomAlert(message, title = "Informasi") {
+      return new Promise((resolve) => {
+        document.getElementById("customModalTitle").innerText = title;
+        document.getElementById("customModalMsg").innerText = message;
+        document.getElementById("customModalCancelBtn").style.display = "none";
+        document.getElementById("customModalOverlay").classList.add("active");
+        modalCallback = (res) => resolve(res);
+      });
+    }
+
+    function showCustomConfirm(message, title = "Konfirmasi") {
+      return new Promise((resolve) => {
+        document.getElementById("customModalTitle").innerText = title;
+        document.getElementById("customModalMsg").innerText = message;
+        document.getElementById("customModalCancelBtn").style.display = "block";
+        document.getElementById("customModalOverlay").classList.add("active");
+        modalCallback = (res) => resolve(res);
+      });
+    }
+
+    function closeCustomModal(result) {
+      document.getElementById("customModalOverlay").classList.remove("active");
+      if(modalCallback) {
+        modalCallback(result);
+        modalCallback = null;
+      }
+    }
+
+    // Load Profile Picture sesuai index.html dari localStorage
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedPic = localStorage.getItem("profile_picture") || localStorage.getItem("user_avatar");
+      if(savedPic) {
+        const topBtn = document.getElementById("topProfileBtn");
+        topBtn.innerHTML = `<img src="${savedPic}" alt="Profile">`;
+      }
+    });
+
+    // Toggle Dropdown Menu Profil di Pojok Kanan Atas
+    function toggleProfileDropdown(event) {
+      event.stopPropagation();
+      const menu = document.getElementById("profileDropdownMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Tutup dropdown kalau klik di luar area
+    window.addEventListener("click", () => {
+      const menu = document.getElementById("profileDropdownMenu");
+      if (menu.classList.contains("active")) {
+        menu.classList.remove("active");
+      }
+    });
+
+    function openPengaturanPage() {
+      showCustomAlert("Halaman Pengaturan segera hadir!", "Pengaturan");
+    }
+
+    const STORAGE_KEY = "kostku_transaksi";
+
+    const KATEGORI_INCOME = [
+      { 
+        key: "gaji",      
+        label: "Gaji", 
+        svg: `<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>` 
+      },
+      { 
+        key: "transferan", 
+        label: "Transferan", 
+        svg: `<path d="M9.01 14H2v2h7.01v3L13 15l-3.99-4v3zM14.99 13v-3H22V8h-7.01V5L11 9l3.99 4z"/>` 
+      },
+      { 
+        key: "lain_income", 
+        label: "Uang Lain", 
+        svg: `<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>` 
+      }
+    ];
+
+    const KATEGORI_EXPENSE = [
+      { 
+        key: "jajan",   
+        label: "Jajan", 
+        svg: `<path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/>` 
+      },
+      { 
+        key: "cicilan", 
+        label: "Cicilan", 
+        svg: `<path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>` 
+      },
+      { 
+        key: "lain_expense", 
+        label: "Bayar Lain", 
+        svg: `<path d="M19 13H5v-2h14v2z"/>` 
+      }
+    ];
+
+    function getTransaksi() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function saveTransaksi(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function generateId() {
+      return "tx_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+    }
+
+    const BULAN_NAMA = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+    function bulanKeyFromDate(dateStr) {
+      return dateStr.slice(0, 7);
+    }
+
+    function bulanLabelFromKey(key) {
+      const [y, m] = key.split("-");
+      return `${BULAN_NAMA[parseInt(m,10)-1]} ${y}`;
+    }
+
+    function formatIDR(num) {
+      num = Math.round(num);
+      if (num < 0) {
+        return "-Rp " + Math.abs(num).toLocaleString('id-ID');
+      }
+      return "Rp " + num.toLocaleString('id-ID');
+    }
+
+    function formatTanggalIndo(dateStr) {
+      const d = new Date(dateStr + "T00:00:00");
+      const hari = d.getDate();
+      const bulan = BULAN_NAMA[d.getMonth()];
+      return `${hari} ${bulan}`;
+    }
+
+    let selectedMonthKey = null;
+
+    function getAvailableMonths() {
+      const list = getTransaksi();
+      const monthSet = new Set(list.map(t => bulanKeyFromDate(t.tanggal)));
+      const months = Array.from(monthSet);
+      months.sort().reverse();
+      return months;
+    }
+
+    function renderMonthFilter() {
+      const wrap = document.getElementById("monthFilterScroll");
+      const months = getAvailableMonths();
+
+      if (months.length === 0) {
+        const now = new Date();
+        const key = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+        months.push(key);
+      }
+
+      if (!selectedMonthKey || !months.includes(selectedMonthKey)) {
+        selectedMonthKey = months[0];
+      }
+
+      wrap.innerHTML = months.map(key => `
+        <div class="month-chip ${key === selectedMonthKey ? 'active' : ''}" onclick="pilihBulan('${key}')">
+          ${bulanLabelFromKey(key)}
+        </div>
+      `).join("");
+    }
+
+    function pilihBulan(key) {
+      selectedMonthKey = key;
+      renderMonthFilter();
+      renderHistory();
+      renderHealthDashboard();
+    }
+
+    function iconSvgFor(kategoriKey) {
+      const map = {
+        gaji: `<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>`,
+        transferan: `<path d="M9.01 14H2v2h7.01v3L13 15l-3.99-4v3zM14.99 13v-3H22V8h-7.01V5L11 9l3.99 4z"/>`,
+        lain_income: `<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>`,
+        jajan: `<path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/>`,
+        cicilan: `<path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>`,
+        lain_expense: `<path d="M19 13H5v-2h14v2z"/>`
+      };
+      return map[kategoriKey] || `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>`;
+    }
+
+    function kategoriLabel(tipe, key) {
+      const list = tipe === 'income' ? KATEGORI_INCOME : KATEGORI_EXPENSE;
+      const found = list.find(k => k.key === key);
+      return found ? found.label : key;
+    }
+
+    function renderHistory() {
+      const list = getTransaksi().filter(t => bulanKeyFromDate(t.tanggal) === selectedMonthKey);
+      list.sort((a, b) => (b.tanggal + b.id).localeCompare(a.tanggal + a.id));
+
+      const container = document.getElementById("historyList");
+      const labelEl = document.getElementById("historyMonthLabel");
+      labelEl.innerText = selectedMonthKey ? bulanLabelFromKey(selectedMonthKey) : "";
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="history-empty">Belum ada transaksi di bulan ini.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(t => {
+        const isIncome = t.tipe === 'income';
+        const labelKategori = kategoriLabel(t.tipe, t.kategori);
+        const svg = iconSvgFor(t.kategori);
+        return `
+          <div class="history-item" onclick="openEditPopup('${t.id}')">
+            <div class="history-icon ${isIncome ? 'income-bg' : 'expense-bg'}">
+              <svg viewBox="0 0 24 24">${svg}</svg>
+            </div>
+            <div class="history-info">
+              <div class="history-cat">${labelKategori}</div>
+              <div class="history-note">${t.catatan ? t.catatan : '-'}</div>
+              <div class="history-date">${formatTanggalIndo(t.tanggal)}</div>
+            </div>
+            <div class="history-amount ${isIncome ? 'income' : 'expense'}">
+              ${isIncome ? '+' : '-'}${formatIDR(t.nominal)}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderHealthDashboard() {
+      const list = getTransaksi().filter(t => bulanKeyFromDate(t.tanggal) === selectedMonthKey);
+
+      let totalIncome = 0;
+      let totalExpense = 0;
+
+      list.forEach(t => {
+        if (t.tipe === 'income') totalIncome += t.nominal;
+        else totalExpense += t.nominal;
+      });
+
+      const sisa = totalIncome - totalExpense;
+      let rasio = totalIncome > 0 ? (totalExpense / totalIncome) * 100 : (totalExpense > 0 ? 999 : 0);
+
+      const barFill = document.getElementById("ffpBarFill");
+      const barPercent = document.getElementById("ffpBarPercent");
+      const badge = document.getElementById("healthBadge");
+      const warningBox = document.getElementById("healthWarningBox");
+      const warningText = document.getElementById("healthWarningText");
+
+      const rasioClamped = Math.min(rasio, 150);
+      const barWidthPercent = Math.min((rasioClamped / 150) * 100, 100);
+
+      barFill.style.width = barWidthPercent + "%";
+      barPercent.innerText = Math.round(rasio) + "%";
+
+      document.getElementById("statRasio").innerText = Math.round(rasio) + "%";
+      document.getElementById("statSisa").innerText = formatIDR(sisa);
+      document.getElementById("statSisa").style.color = sisa < 0 ? "var(--merah)" : "var(--abu-terang)";
+
+      if (rasio < 80) {
+        barFill.style.background = "var(--hijau)";
+        badge.className = "health-badge sehat";
+        badge.innerText = "SEHAT";
+        warningBox.classList.remove("active");
+      } else if (rasio <= 100) {
+        barFill.style.background = "var(--kuning)";
+        badge.className = "health-badge waspada";
+        badge.innerText = "WASPADA";
+        warningBox.classList.add("active");
+        warningText.innerHTML = `Pengeluaran bulan ini <b>mendekati atau menyamai</b> total pendapatan. Mulai hati-hati sama pengeluaran ya!`;
+      } else {
+        barFill.style.background = "var(--merah)";
+        badge.className = "health-badge bahaya";
+        badge.innerText = "BAHAYA";
+        warningBox.classList.add("active");
+        warningText.innerHTML = `Pengeluaran bulan ini <b>melebihi total pendapatan</b> sebesar ${formatIDR(Math.abs(sisa))}! Cash flow lagi minus.`;
+      }
+    }
+
+    let currentTipe = 'income';
+    let currentKategori = null;
+    let editingId = null;
+
+    function pilihTipe(tipe) {
+      currentTipe = tipe;
+      currentKategori = null;
+
+      document.getElementById("btnTipeIncome").classList.toggle("selected", tipe === 'income');
+      document.getElementById("btnTipeIncome").classList.toggle("income", true);
+      document.getElementById("btnTipeExpense").classList.toggle("selected", tipe === 'expense');
+      document.getElementById("btnTipeExpense").classList.toggle("expense", true);
+
+      renderKategoriGrid();
+    }
+
+    function renderKategoriGrid() {
+      const grid = document.getElementById("kategoriGrid");
+      const list = currentTipe === 'income' ? KATEGORI_INCOME : KATEGORI_EXPENSE;
+      grid.innerHTML = list.map(k => `
+        <div class="kategori-chip ${currentKategori === k.key ? 'selected' : ''}" onclick="pilihKategori('${k.key}')">
+          <svg viewBox="0 0 24 24">${k.svg}</svg>
+          <span>${k.label}</span>
+        </div>
+      `).join("");
+    }
+
+    function pilihKategori(key) {
+      currentKategori = key;
+      renderKategoriGrid();
+    }
+
+    function todayDateStr() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth()+1).padStart(2,'0');
+      const d = String(now.getDate()).padStart(2,'0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function openAddPopup() {
+      editingId = null;
+      document.getElementById("transaksiPopupTitle").innerText = "Tambah Transaksi";
+      document.getElementById("inputNominal").value = "";
+      document.getElementById("inputCatatan").value = "";
+      document.getElementById("inputTanggal").value = todayDateStr();
+
+      currentTipe = 'income';
+      currentKategori = null;
+      pilihTipe('income');
+
+      document.getElementById("modalBtnRow").innerHTML = `
+        <button type="button" class="modal-btn batal" onclick="closeTransaksiPopup()">Batal</button>
+        <button type="button" class="modal-btn simpan" onclick="simpanTransaksi()">Simpan</button>
+      `;
+
+      document.getElementById("transaksiPopup").classList.add("active");
+    }
+
+    function openEditPopup(id) {
+      const list = getTransaksi();
+      const tx = list.find(t => t.id === id);
+      if (!tx) return;
+
+      editingId = id;
+      document.getElementById("transaksiPopupTitle").innerText = "Edit Transaksi";
+      document.getElementById("inputNominal").value = tx.nominal;
+      document.getElementById("inputCatatan").value = tx.catatan || "";
+      document.getElementById("inputTanggal").value = tx.tanggal;
+
+      currentTipe = tx.tipe;
+      currentKategori = tx.kategori;
+      pilihTipe(tx.tipe);
+      currentKategori = tx.kategori;
+      renderKategoriGrid();
+
+      document.getElementById("modalBtnRow").innerHTML = `
+        <button type="button" class="modal-btn hapus" onclick="hapusTransaksi()">Hapus</button>
+        <button type="button" class="modal-btn batal" onclick="closeTransaksiPopup()">Batal</button>
+        <button type="button" class="modal-btn simpan" onclick="simpanTransaksi()">Simpan</button>
+      `;
+
+      document.getElementById("transaksiPopup").classList.add("active");
+    }
+
+    function closeTransaksiPopup() {
+      document.getElementById("transaksiPopup").classList.remove("active");
+    }
+
+    async function simpanTransaksi() {
+      const nominalRaw = document.getElementById("inputNominal").value;
+      const tanggal = document.getElementById("inputTanggal").value;
+      const catatan = document.getElementById("inputCatatan").value.trim();
+
+      const nominal = parseFloat(nominalRaw);
+
+      if (!currentKategori) {
+        await showCustomAlert("Pilih kategori dulu ya!", "Kesalahan");
+        return;
+      }
+      if (isNaN(nominal) || nominal <= 0) {
+        await showCustomAlert("Nominal harus diisi dan lebih dari 0!", "Kesalahan");
+        return;
+      }
+      if (!tanggal) {
+        await showCustomAlert("Tanggal harus diisi!", "Kesalahan");
+        return;
+      }
+
+      let list = getTransaksi();
+
+      if (editingId) {
+        list = list.map(t => t.id === editingId ? {
+          ...t,
+          tipe: currentTipe,
+          kategori: currentKategori,
+          nominal: nominal,
+          tanggal: tanggal,
+          catatan: catatan
+        } : t);
+      } else {
+        list.push({
+          id: generateId(),
+          tipe: currentTipe,
+          kategori: currentKategori,
+          nominal: nominal,
+          tanggal: tanggal,
+          catatan: catatan
+        });
+      }
+
+      saveTransaksi(list);
+      recalcDashboardTotals();
+      closeTransaksiPopup();
+
+      selectedMonthKey = bulanKeyFromDate(tanggal);
+      renderMonthFilter();
+      renderHistory();
+      renderHealthDashboard();
+    }
+
+    async function hapusTransaksi() {
+      const conf = await showCustomConfirm("Yakin mau hapus transaksi ini?", "Konfirmasi Hapus");
+      if (!conf) return;
+
+      let list = getTransaksi();
+      list = list.filter(t => t.id !== editingId);
+      saveTransaksi(list);
+      recalcDashboardTotals();
+      closeTransaksiPopup();
+
+      renderMonthFilter();
+      renderHistory();
+      renderHealthDashboard();
+    }
+
+    function recalcDashboardTotals() {
+      const list = getTransaksi();
+      let totalIncome = 0;
+      let totalExpense = 0;
+
+      list.forEach(t => {
+        if (t.tipe === 'income') totalIncome += t.nominal;
+        else totalExpense += t.nominal;
+      });
+
+      localStorage.setItem("kostku_total_income", totalIncome);
+      localStorage.setItem("kostku_total_expense", totalExpense);
+    }
+
+    const navItems = [
+      { href: "index.html",          label: "Home",
+        svg: `<path d="M12 3l9 8h-3v9h-4v-6H10v6H6v-9H3l9-8z"/>` },
+      { href: "kelola-uang.html",    label: "Uang", active: true,
+        svg: `<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>` },
+      { href: "utang.html",          label: "Utang",
+        svg: `<path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>` },
+      { href: "rekap.html",          label: "Rekap",
+        svg: `<path d="M3 3v18h18V3H3zm4 14H5v-4h2v4zm4 0h-2V9h2v8zm4 0h-2v-6h2v6zm4 0h-2V7h2v10z"/>` },
+      { href: "penagihan.html",      label: "Penagihan",
+        svg: `<path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm6 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm5 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>` },
+      { href: "profile.html",        label: "Profil",
+        svg: `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>` }
+    ];
+
+    function renderBottomNav() {
+      const nav = document.getElementById("bottomNav");
+      nav.innerHTML = navItems.map(item => `
+        <a href="${item.href}" class="nav-item ${item.active ? 'active' : ''}">
+          <svg viewBox="0 0 24 24">${item.svg}</svg>
+          <span>${item.label}</span>
+        </a>
+      `).join("");
+    }
+
+    function init() {
+      renderBottomNav();
+      recalcDashboardTotals();
+      renderMonthFilter();
+      renderHistory();
+      renderHealthDashboard();
+    }
+
+    init();
+  </script>
+
+</body>
+</html>

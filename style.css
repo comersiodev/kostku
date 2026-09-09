@@ -1,0 +1,186 @@
+/* =========================================================
+   LAYOUT PAKEM — TOPBAR + BOTTOM NAVBAR
+   Reusable, jumlah tombol navbar fleksibel (bukan hardcode).
+   Isi/logic tombol diatur di JS masing-masing halaman.
+   ========================================================= */
+
+:root{
+  --lp-hitam: #000000;
+  --lp-abu-tua: #1a1a1a;
+  --lp-abu: #888888;
+  --lp-abu-terang: #cccccc;
+  --lp-topbar-h: 56px;
+  --lp-bottomnav-h: 64px;
+}
+
+/* =========================================================
+   TOPBAR — brand+greeting kiri, profile circle kanan
+   ========================================================= */
+.lp-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--lp-topbar-h);
+  background: rgba(0, 0, 0, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 20;
+  backdrop-filter: blur(8px);
+}
+
+.lp-topbar-brand-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0; /* biar teks panjang bisa truncate kalau perlu */
+}
+
+.lp-topbar-brand {
+  font-family: 'OswaldBold', sans-serif;
+  font-size: 1.1rem;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lp-topbar-brand .lp-accent {
+  color: var(--lp-abu-terang);
+}
+
+.lp-topbar-greeting {
+  font-size: 0.7rem;
+  color: var(--lp-abu-terang);
+  font-family: 'FiraCondBold', sans-serif;
+  margin-top: 1px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lp-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Buleran profile / foto di kanan atas */
+.lp-profile-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--lp-emas-terang);
+  background: #121814;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.lp-profile-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(255, 209, 102, 0.4);
+}
+
+.lp-profile-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lp-profile-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--lp-emas-terang);
+  padding: 2px;
+}
+
+/* =========================================================
+   BOTTOM NAVBAR — jumlah tombol fleksibel
+   Pakai auto-flow: kolom otomatis dibagi rata sesuai jumlah
+   .lp-nav-item yang ada di dalam .lp-bottom-nav, TANPA perlu
+   ganti CSS kalau jumlah tombol berubah (4, 5, 7, dst).
+   ========================================================= */
+.lp-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--lp-bottomnav-h);
+  background: rgba(10, 14, 11, 0.96);
+  border-top: 1px solid rgba(232, 177, 60, 0.3);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr; /* <-- kunci fleksibilitas jumlah tombol */
+  z-index: 99999;
+  backdrop-filter: blur(8px);
+}
+
+.lp-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #888;
+  font-family: 'FiraCondBold', sans-serif;
+  font-size: 0.55rem;
+  gap: 3px;
+  padding: 4px 2px;
+  transition: color 0.2s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  min-width: 0;
+}
+
+.lp-nav-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.lp-nav-item img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: grayscale(100%) opacity(0.6);
+  transition: filter 0.2s;
+}
+
+.lp-nav-item svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  filter: none;
+}
+
+.lp-nav-item.active,
+.lp-nav-item:hover {
+  color: var(--lp-emas-terang);
+}
+
+.lp-nav-item.active img,
+.lp-nav-item:hover img {
+  filter: none;
+}
+
+/* Spacer biar konten body nggak ketutup topbar/bottomnav fixed.
+   Tinggal kasih class ini ke wrapper konten halaman. */
+.lp-content-offset {
+  padding-top: var(--lp-topbar-h);
+  padding-bottom: var(--lp-bottomnav-h);
+}
