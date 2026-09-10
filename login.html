@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Login Google - Kostku</title>
+<title>Login - Kostku</title>
 <link rel="stylesheet" href="style.css">
 <meta name="theme-color" content="#000000">
 <!-- Supabase JS SDK -->
@@ -116,14 +116,10 @@
 
     async function loginWithGoogle() {
       try {
-        // Otomatis deteksi URL halaman aktif (GitHub Pages / Local) sebagai redirect tujuan
         const redirectUrl = window.location.origin + window.location.pathname.replace("login.html", "index.html");
-
         const { data, error } = await _supabase.auth.signInWithOAuth({
           provider: 'google',
-          options: {
-            redirectTo: redirectUrl
-          }
+          options: { redirectTo: redirectUrl }
         });
         if (error) throw error;
       } catch (err) {
@@ -131,9 +127,72 @@
       }
     }
 
+    // Fungsi Sinkronisasi Data ke Supabase Cloud
+    async function syncDataToSupabase() {
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session || !session.user) return;
+        const userId = session.user.id;
+        
+        const profilePayload = {
+          username: localStorage.getItem("username") || "",
+          email: localStorage.getItem("email") || "",
+          profile_picture: localStorage.getItem("profile_picture") || localStorage.getItem("user_avatar") || ""
+        };
+
+        const appPayload = {};
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          appPayload[key] = localStorage.getItem(key);
+        }
+
+        await _supabase.from('kostku_user_data').upsert({
+          user_id: userId,
+          profile_data: profilePayload,
+          app_data: appPayload,
+          updated_at: new Date()
+        });
+      } catch (err) {
+        console.error("Sync error:", err);
+      }
+    }
+
+    // Fungsi Tarik Data dari Supabase Cloud
+    async function loadDataFromSupabase() {
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session || !session.user) return;
+        const userId = session.user.id;
+
+        const { data, error } = await _supabase
+          .from('kostku_user_data')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+
+        if (data) {
+          if (data.app_data) {
+            for (const key in data.app_data) {
+              if (!localStorage.getItem(key)) {
+                localStorage.setItem(key, data.app_data[key]);
+              }
+            }
+          }
+          if (data.profile_data) {
+            if (data.profile_data.username && !localStorage.getItem("username")) localStorage.setItem("username", data.profile_data.username);
+            if (data.profile_data.profile_picture) {
+              localStorage.setItem("profile_picture", data.profile_data.profile_picture);
+              localStorage.setItem("user_avatar", data.profile_data.profile_picture);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Load error:", err);
+      }
+    }
+
     window.addEventListener("DOMContentLoaded", async () => {
       try {
-        // Cek sesi setelah redirect dari Google
         const { data: { session } } = await _supabase.auth.getSession();
         if (session && session.user) {
           localStorage.setItem("google_linked", "true");
@@ -145,6 +204,11 @@
               localStorage.setItem("user_avatar", session.user.user_metadata.avatar_url);
             }
           }
+          
+          // Sinkronisasi cloud dua arah
+          await loadDataFromSupabase();
+          await syncDataToSupabase();
+
           window.location.href = "index.html";
         }
       } catch(e) {}
