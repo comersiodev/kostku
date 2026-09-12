@@ -6,12 +6,11 @@
 <title>Login - Kostku</title>
 <link rel="stylesheet" href="style.css">
 <meta name="theme-color" content="#000000">
-<!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  @font-face{ font-family: 'OswaldBold'; src: url('oswald-bold.ttf') format('truetype'); font-weight: 700; font-style: normal; }
-  @font-face{ font-family: 'FiraCondBold'; src: url('firasanscondensed-bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
-  @font-face{ font-family: 'FiraCondBook'; src: url('firasanscondensed-book.otf') format('opentype'); font-weight: 400; font-style: normal; }
+  @font-face{ font-family: 'OswaldBold'; src: url('oswald-bold.ttf') format('truetype'); font-weight: 700; }
+  @font-face{ font-family: 'FiraCondBold'; src: url('firasanscondensed-bold.otf') format('opentype'); font-weight: 700; }
+  @font-face{ font-family: 'FiraCondBook'; src: url('firasanscondensed-book.otf') format('opentype'); font-weight: 400; }
 
   :root{ --abu: #888888; --abu-terang: #cccccc; --abu-tua: #1a1a1a; --gelap: #000000; --biru: #38bdf8; --hijau: #4ade80; }
   *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -24,17 +23,13 @@
   }
   .bg-dim{ position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1; }
 
-  .login-container {
-    position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; padding: 20px;
-  }
+  .login-container { position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 
   .login-card {
     width: 100%; max-width: 340px; background: linear-gradient(135deg, #0d0d0d, #1c1c1c);
     border: 2px solid var(--abu); border-radius: 20px; padding: 28px 20px; text-align: center;
     box-shadow: 0 8px 24px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 16px;
   }
-
   .login-brand { font-family: 'OswaldBold', sans-serif; font-size: 2rem; color: #fff; margin-bottom: -4px; }
   .login-brand span { color: var(--abu-terang); }
   .login-subtitle { font-size: 0.85rem; color: var(--abu-terang); margin-bottom: 8px; }
@@ -46,6 +41,7 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
   .btn-google:hover { background: #f1f1f1; transform: translateY(-1px); }
+  .btn-google:disabled { opacity: .6; cursor: wait; }
   .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
 
   .btn-skip {
@@ -58,7 +54,7 @@
   .popupBox.active { display: flex; }
   .custom-modal-box { background: #0d0d0d; border: 2px solid var(--abu-terang); border-radius: 16px; padding: 20px; width: 100%; max-width: 320px; text-align: center; }
   .custom-modal-title { font-family: 'FiraCondBold', sans-serif; font-size: 1.1rem; color: var(--abu-terang); margin-bottom: 8px; }
-  .custom-modal-msg { font-size: 0.9rem; color: #ddd; margin-bottom: 16px; line-height: 1.4; }
+  .custom-modal-msg { font-size: 0.9rem; color: #ddd; margin-bottom: 16px; line-height: 1.4; white-space: pre-wrap; }
   .custom-modal-btn { width: 100%; padding: 10px; border-radius: 8px; font-family: 'FiraCondBold', sans-serif; font-size: 0.9rem; cursor: pointer; border: none; background: var(--abu-terang); color: #000; }
 </style>
 </head>
@@ -74,7 +70,7 @@
         <div class="login-subtitle">Masuk dengan Akun Google</div>
       </div>
 
-      <button type="button" class="btn-google" onclick="loginWithGoogle()">
+      <button type="button" id="btnGoogle" class="btn-google" onclick="loginWithGoogle()">
         <svg viewBox="0 0 24 24">
           <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
           <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.15v3.14C3.13 21.32 7.22 24 12 24z"/>
@@ -97,130 +93,174 @@
   </div>
 
   <script>
+    /* ================= KONFIG ================= */
     const SUPABASE_URL = 'https://hdzghpgwciobqharhpjm.supabase.co';
     const SUPABASE_ANON_KEY = 'Sb_publishable_NYBzyUfQUny8b38Vj9xXiA_t-W4FItY';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function showCustomAlert(message, title = "Informasi") {
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        flowType: 'implicit'
+      }
+    });
+
+    /* ================= MODAL ================= */
+    let _modalCallback = null;
+    function showCustomAlert(message, title = "Informasi", onClose = null) {
       document.getElementById("customModalTitle").innerText = title;
       document.getElementById("customModalMsg").innerText = message;
       document.getElementById("customModalOverlay").classList.add("active");
+      _modalCallback = onClose;
     }
-
     function closeCustomModal() {
       document.getElementById("customModalOverlay").classList.remove("active");
+      const cb = _modalCallback; _modalCallback = null;
+      if (typeof cb === 'function') cb();
     }
 
+    /* ================= LOGIN GOOGLE ================= */
     async function loginWithGoogle() {
+      const btn = document.getElementById('btnGoogle');
+      btn.disabled = true;
       try {
-        const redirectUrl = window.location.origin + window.location.pathname.replace("login.html", "index.html");
-        const { data, error } = await _supabase.auth.signInWithOAuth({
+        // resolve index.html relatif terhadap folder saat ini (aman dari "/" maupun "/login.html")
+        const redirectUrl = new URL('index.html', window.location.href).href;
+
+        const { error } = await _supabase.auth.signInWithOAuth({
           provider: 'google',
-          options: { redirectTo: redirectUrl }
+          options: {
+            redirectTo: redirectUrl,
+            queryParams: { prompt: 'select_account' }
+          }
         });
         if (error) throw error;
       } catch (err) {
-        showCustomAlert("Gagal Login Google: " + err.message, "Kesalahan");
+        btn.disabled = false;
+        showCustomAlert("Gagal Login Google: " + (err.message || err), "Kesalahan");
       }
     }
 
-    async function syncDataToSupabase() {
-      try {
-        const { data: { session } } = await _supabase.auth.getSession();
-        if (!session || !session.user) return;
-        const userId = session.user.id;
-        
-        const profilePayload = {
-          username: localStorage.getItem("username") || "",
-          email: localStorage.getItem("email") || "",
-          profile_picture: localStorage.getItem("profile_picture") || localStorage.getItem("user_avatar") || ""
-        };
+    /* ================= SIMPAN / AMBIL DATA ================= */
+    function collectLocalData() {
+      const appData = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        if (key.startsWith('sb-')) continue;            // JANGAN simpan token auth ke DB
+        if (key === 'google_linked') continue;          // flag lokal saja
+        appData[key] = localStorage.getItem(key);
+      }
+      return appData;
+    }
 
-        const appPayload = {};
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          appPayload[key] = localStorage.getItem(key);
+    function applyUserMetaToLocal(user) {
+      localStorage.setItem('google_linked', 'true');
+      if (user.email) localStorage.setItem('email', user.email);
+
+      const meta = user.user_metadata || {};
+      const name = meta.full_name || meta.name;
+      const avatar = meta.avatar_url || meta.picture;
+
+      // jangan timpa username custom yang sudah diisi user
+      if (name && !localStorage.getItem('username')) localStorage.setItem('username', name);
+      if (avatar) {
+        localStorage.setItem('profile_picture', avatar);
+        localStorage.setItem('user_avatar', avatar);
+      }
+    }
+
+    async function syncDataToSupabase(session) {
+      const user = session && session.user;
+      if (!user) throw new Error('Session tidak ditemukan.');
+
+      const payload = {
+        user_id: user.id,
+        profile_data: {
+          username: localStorage.getItem('username') || '',
+          email: localStorage.getItem('email') || '',
+          profile_picture: localStorage.getItem('profile_picture') || localStorage.getItem('user_avatar') || ''
+        },
+        app_data: collectLocalData(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await _supabase
+        .from('kostku_user_data')
+        .upsert(payload, { onConflict: 'user_id' });   // <-- KUNCI UTAMANYA
+
+      if (error) throw error;
+    }
+
+    async function loadDataFromSupabase(session) {
+      const user = session && session.user;
+      if (!user) return;
+
+      const { data, error } = await _supabase
+        .from('kostku_user_data')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();                                 // pakai maybeSingle biar gak error kalau kosong
+
+      if (error) throw error;
+      if (!data) return;
+
+      if (data.app_data && typeof data.app_data === 'object') {
+        for (const key in data.app_data) {
+          if (key.startsWith('sb-')) continue;
+          const lokal = localStorage.getItem(key);
+          if (lokal === null || lokal === '') localStorage.setItem(key, data.app_data[key]);
         }
+      }
+      if (data.profile_data) {
+        if (data.profile_data.username && !localStorage.getItem('username'))
+          localStorage.setItem('username', data.profile_data.username);
+        if (data.profile_data.profile_picture) {
+          localStorage.setItem('profile_picture', data.profile_data.profile_picture);
+          localStorage.setItem('user_avatar', data.profile_data.profile_picture);
+        }
+      }
+    }
 
-        const { error } = await _supabase.from('kostku_user_data').upsert({
-          user_id: userId,
-          profile_data: profilePayload,
-          app_data: appPayload,
-          updated_at: new Date()
-        });
+    /* ================= BOOTSTRAP SETELAH REDIRECT ================= */
+    let _handled = false;
 
-        if (error) console.error("Cloud Sync Error:", error);
+    async function handleSignedIn(session) {
+      if (_handled || !session || !session.user) return;
+      _handled = true;
+
+      try {
+        applyUserMetaToLocal(session.user);
+        await loadDataFromSupabase(session);   // tarik dulu data cloud
+        await syncDataToSupabase(session);     // baru simpan gabungannya
+        window.location.replace('index.html');
       } catch (err) {
-        console.error("Sync exception:", err);
+        console.error('Sinkronisasi gagal:', err);
+        _handled = false;
+        showCustomAlert(
+          "Login berhasil, tapi data gagal disimpan ke cloud:\n\n" + (err.message || err) +
+          "\n\nCek tabel 'kostku_user_data' & RLS policy di Supabase.",
+          "Sinkronisasi Gagal"
+        );
       }
     }
 
-    async function loadDataFromSupabase() {
-      try {
-        const { data: { session } } = await _supabase.auth.getSession();
-        if (!session || !session.user) return;
-        const userId = session.user.id;
-
-        const { data, error } = await _supabase
-          .from('kostku_user_data')
-          .select('*')
-          .eq('user_id', userId)
-          .single();
-
-        if (data) {
-          if (data.app_data) {
-            for (const key in data.app_data) {
-              if (!localStorage.getItem(key)) {
-                localStorage.setItem(key, data.app_data[key]);
-              }
-            }
-          }
-          if (data.profile_data) {
-            if (data.profile_data.username && !localStorage.getItem("username")) {
-              localStorage.setItem("username", data.profile_data.username);
-            }
-            if (data.profile_data.profile_picture) {
-              localStorage.setItem("profile_picture", data.profile_data.profile_picture);
-              localStorage.setItem("user_avatar", data.profile_data.profile_picture);
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Load exception:", err);
+    // Deteksi sesi dari URL hash (#access_token=...) — ini yang bikin kode lama gagal
+    _supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) return;
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        // JANGAN await langsung di dalam callback (bisa deadlock di supabase-js v2)
+        setTimeout(() => handleSignedIn(session), 0);
       }
-    }
+    });
 
-    window.addEventListener("DOMContentLoaded", async () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       try {
         const { data: { session } } = await _supabase.auth.getSession();
-        if (session && session.user) {
-          localStorage.setItem("google_linked", "true");
-          localStorage.setItem("email", session.user.email);
-          
-          if(session.user.user_metadata) {
-            if(session.user.user_metadata.full_name) {
-              localStorage.setItem("username", session.user.user_metadata.full_name);
-            }
-            // Tangkap foto profil Google secara akurat
-            const avatarUrl = session.user.user_metadata.avatar_url || session.user.user_metadata.picture;
-            if(avatarUrl) {
-              localStorage.setItem("profile_picture", avatarUrl);
-              localStorage.setItem("user_avatar", avatarUrl);
-            }
-          }
-          
-          // Tampilkan alert loading supaya user tahu proses sync sedang berjalan
-          showCustomAlert("Menyinkronkan data dengan Cloud Supabase...", "Mohon Tunggu");
-
-          // Tunggu sampai tarik data dan push data benar-benar selesai
-          await loadDataFromSupabase();
-          await syncDataToSupabase();
-
-          // Baru pindah halaman setelah fix terkirim
-          window.location.href = "index.html";
-        }
-      } catch(e) {
-        console.error("Init session error:", e);
+        if (session) handleSignedIn(session);
+      } catch (e) {
+        console.error(e);
       }
     });
   </script>
